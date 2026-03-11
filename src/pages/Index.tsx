@@ -700,16 +700,30 @@ export default function HomePage() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30" style={{ paddingBottom: 'var(--safe-bottom)' }}>
         <div className="flex items-center justify-around h-14">
           <button onClick={() => { setView("home"); setShowBusca(false); }}
-            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view !== "cron" ? "text-gray-900" : "text-gray-400"}`}>
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 relative ${view === "home" || view === "detalhe" ? "text-gray-900" : "text-gray-400"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <span className="text-[10px] font-medium">Intimações</span>
-            {totalNovas > 0 && view !== "cron" && (
+            {totalNovas > 0 && (
               <span className="absolute top-1.5 ml-8 w-4 h-4 bg-blue-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                 {totalNovas > 9 ? "9+" : totalNovas}
               </span>
             )}
+          </button>
+          <button onClick={() => setView("agenda")}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "agenda" ? "text-gray-900" : "text-gray-400"}`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="text-[10px] font-medium">Agenda</span>
+          </button>
+          <button onClick={() => setView("clientes")}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "clientes" ? "text-gray-900" : "text-gray-400"}`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="text-[10px] font-medium">Clientes</span>
           </button>
           <button onClick={() => setView("cron")}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "cron" ? "text-gray-900" : "text-gray-400"}`}>
