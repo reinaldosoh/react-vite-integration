@@ -41,6 +41,42 @@ async function callProxy(action: string, payload?: Record<string, unknown>) {
   return res.data
 }
 
+function normalizeOab(value?: string) {
+  return (value || '').replace(/\D/g, '')
+}
+
+function toDateKey(value?: string): number | null {
+  if (!value) return null
+
+  // yyyy-mm-dd
+  if (value.includes('-')) {
+    const [y, m, d] = value.split('-').map(Number)
+    if (!y || !m || !d) return null
+    return Date.UTC(y, m - 1, d)
+  }
+
+  // dd/mm/yyyy
+  if (value.includes('/')) {
+    const [d, m, y] = value.split('/').map(Number)
+    if (!y || !m || !d) return null
+    return Date.UTC(y, m - 1, d)
+  }
+
+  return null
+}
+
+function isWithinDateRange(dateValue?: string, start?: string, end?: string) {
+  const current = toDateKey(dateValue)
+  if (current === null) return false
+
+  const startKey = toDateKey(start)
+  const endKey = toDateKey(end)
+
+  if (startKey !== null && current < startKey) return false
+  if (endKey !== null && current > endKey) return false
+  return true
+}
+
 export async function iniciarBusca(payload: {
   oab: string;
   uf_oab: string;
@@ -79,12 +115,25 @@ export async function deletarIntimacao(id: string): Promise<{ ok: boolean; erro?
 }
 
 // ── Sync TODAS: busca /api/todas do EasyPanel, insere no Supabase só as que faltam
-export async function sincronizarTodasRemoto(): Promise<SyncResult> {
+export async function sincronizarTodasRemoto(filters?: {
+  oab?: string;
+  data_inicio?: string;
+  data_fim?: string;
+}): Promise<SyncResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Não autenticado')
 
-  const remoto: Intimacao[] = await callProxy('todas')
-  if (!remoto || remoto.length === 0) {
+  const remotoBruto: Intimacao[] = await callProxy('todas')
+  const oabFiltro = normalizeOab(filters?.oab)
+
+  const remoto = (remotoBruto || []).filter((i) => {
+    const oabItem = normalizeOab(i._oab || i.oab)
+    const matchOab = oabFiltro ? oabItem === oabFiltro : true
+    const matchData = isWithinDateRange(i.data_disponibilizacao, filters?.data_inicio, filters?.data_fim)
+    return matchOab && matchData
+  })
+
+  if (remoto.length === 0) {
     return { novas: 0, duplicadas: 0, duplicadasList: [] }
   }
 

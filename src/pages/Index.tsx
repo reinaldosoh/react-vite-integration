@@ -550,6 +550,7 @@ export default function HomePage() {
   const [toast, setToast] = useState<string | null>(null);
   const [showMais, setShowMais] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ultimaBuscaRef = useRef<{ oab: string; data_inicio: string; data_fim: string } | null>(null);
 
   async function handleLogout() { await supabase.auth.signOut(); navigate("/login"); }
 
@@ -574,7 +575,11 @@ export default function HomePage() {
         try {
           const sync = status.arquivo_resultado
             ? await sincronizarNovasIntimacoes(status.arquivo_resultado)
-            : await sincronizarTodasRemoto();
+            : await sincronizarTodasRemoto({
+                oab: ultimaBuscaRef.current?.oab,
+                data_inicio: ultimaBuscaRef.current?.data_inicio,
+                data_fim: ultimaBuscaRef.current?.data_fim,
+              });
 
           await carregarTodas();
 
@@ -596,6 +601,7 @@ export default function HomePage() {
 
   async function handleBuscar(oab: string, uf: string, inicio: string, fim: string) {
     setShowBusca(false); setLoading(true); setErro(null); setLogBusca("Iniciando...\n");
+    ultimaBuscaRef.current = { oab: oab.trim(), data_inicio: inicio, data_fim: fim };
     try {
       const data = await iniciarBusca({ oab, uf_oab: uf, data_inicio: inicio, data_fim: fim });
       if (data.erro) { setErro(data.erro); setLoading(false); return; }
