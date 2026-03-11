@@ -391,7 +391,7 @@ export default function TarefasPage() {
                           </button>
                         </td>
 
-                        <td className="px-3 py-3 text-base text-muted-foreground">{rowNum}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{rowNum}</td>
 
                         <td className="min-w-[210px] px-3 py-3">
                           <p className="text-[1.5rem] font-semibold leading-tight text-foreground">{t.titulo}</p>
