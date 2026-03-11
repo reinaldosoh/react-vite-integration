@@ -37,8 +37,8 @@
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 217.2 91.2% 59.8%;
 
-  --task-brand: 347 74% 35%;
-  --task-brand-foreground: 0 0% 100%;
+  --task-brand: 222.2 84% 4.9%;
+  --task-brand-foreground: 210 40% 98%;
   --task-accent-warning: 36 95% 51%;
   --task-accent-info: 218 84% 57%;
   --task-accent-danger: 0 82% 58%;
@@ -77,8 +77,8 @@
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
 
-  --task-brand: 347 74% 52%;
-  --task-brand-foreground: 0 0% 100%;
+  --task-brand: 210 40% 98%;
+  --task-brand-foreground: 222.2 84% 4.9%;
   --task-accent-warning: 36 95% 58%;
   --task-accent-info: 218 84% 65%;
   --task-accent-danger: 0 82% 66%;

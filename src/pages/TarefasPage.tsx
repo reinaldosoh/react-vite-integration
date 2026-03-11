@@ -189,133 +189,112 @@ export default function TarefasPage() {
   ];
 
   return (
-    <div className="fade-in space-y-5">
+    <div className="fade-in space-y-6">
+      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-[2rem] font-semibold leading-tight text-foreground">Lista de Tarefas</h1>
-          <p className="mt-1 text-[1.35rem] text-muted-foreground">Gerencie suas tarefas processuais e administrativas</p>
+          <h1 className="text-2xl font-bold text-foreground">Lista de Tarefas</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">Gerencie suas tarefas processuais e administrativas</p>
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="hidden md:inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-base text-foreground transition hover:bg-muted"
+          className="hidden md:inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground transition hover:bg-muted"
         >
           <RefreshCw className="h-4 w-4" />
           Atualizar
         </button>
       </div>
 
-      <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/40 p-1">
-        <button className="rounded-lg bg-background px-4 py-1.5 text-base font-medium text-foreground shadow-sm">Minhas</button>
-        <button className="rounded-lg px-4 py-1.5 text-base text-muted-foreground">Gerais</button>
+      {/* Minhas / Gerais toggle */}
+      <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
+        <button className="rounded-md bg-background px-3 py-1 text-sm font-medium text-foreground shadow-sm">Minhas</button>
+        <button className="rounded-md px-3 py-1 text-sm text-muted-foreground">Gerais</button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-7">
-        {cards.map((card, index) => {
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7">
+        {cards.map((card) => {
           const Icon = card.icon;
           return (
             <div key={card.label} className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="flex items-start justify-between px-4 pb-3 pt-4">
-                <p className="text-base text-muted-foreground">{card.label}</p>
-                {index === 0 ? (
-                  <button className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                    7 dias
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
-                ) : (
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-muted/70 text-muted-foreground">
-                    <Icon className="h-4 w-4" />
-                  </span>
-                )}
+              <div className="flex items-start justify-between px-4 pb-2 pt-3">
+                <p className="text-xs text-muted-foreground">{card.label}</p>
               </div>
-              <div className="px-4 pb-3 text-[2rem] font-semibold leading-none text-foreground">{card.count}</div>
+              <div className="px-4 pb-3 text-2xl font-bold leading-none text-foreground">{card.count}</div>
               <div className={cn("h-1 w-full", CARD_BAR_CLASS[card.tone])} />
             </div>
           );
         })}
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-3">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-2">
-            <div className="relative w-full min-w-[240px] flex-1 xl:max-w-[360px]">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Buscar tarefas..."
-                value={busca}
-                onChange={(e) => {
-                  setBusca(e.target.value);
-                  setPag(0);
-                }}
-                className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-base text-foreground outline-none transition focus:ring-2 focus:ring-ring"
-              />
-            </div>
-
-            <div className="relative">
-              <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <select
-                value={filtroStatus}
-                onChange={(e) => {
-                  setFiltroStatus(e.target.value as FiltroStatus);
-                  setPag(0);
-                }}
-                className="h-11 min-w-[140px] rounded-xl border border-border bg-background pl-9 pr-8 text-base text-foreground outline-none"
-              >
-                {STATUS_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <select
-              value={filtroTipo}
-              onChange={(e) => {
-                setFiltroTipo(e.target.value);
-                setPag(0);
-              }}
-              className="h-11 min-w-[170px] rounded-xl border border-border bg-background px-3 text-base text-foreground outline-none"
-            >
-              <option value="">Todos os tipos</option>
-              {Object.entries(TIPO_TAREFA).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </select>
-
-            <button
-              onClick={() => setModalEtiquetas(true)}
-              className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted"
-            >
-              <Tag className="h-4 w-4" />
-              Etiquetas
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <button className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted">
-              <Download className="h-4 w-4" />
-              Exportar
-            </button>
-            <button
-              onClick={() => setModalEtiquetas(true)}
-              className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted"
-            >
-              <Settings2 className="h-4 w-4" />
-              Gerenciar
-            </button>
-            <button
-              onClick={() => setModalCriar(true)}
-              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[hsl(var(--task-brand))] px-5 text-base font-semibold text-[hsl(var(--task-brand-foreground))] transition hover:opacity-95"
-            >
-              <Plus className="h-4 w-4" />
-              Nova Tarefa
-            </button>
-          </div>
+      {/* Filters bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Buscar tarefas..."
+            value={busca}
+            onChange={(e) => { setBusca(e.target.value); setPag(0); }}
+            className="h-10 w-56 rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
+          />
         </div>
-        <p className="mt-1 text-right text-sm text-muted-foreground">{filtered.length} tarefas</p>
+
+        <div className="h-6 w-px bg-border" />
+
+        {/* Status select */}
+        <div className="relative">
+          <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <select
+            value={filtroStatus}
+            onChange={(e) => { setFiltroStatus(e.target.value as FiltroStatus); setPag(0); }}
+            className="h-10 rounded-lg border border-border bg-background pl-8 pr-6 text-sm text-foreground outline-none"
+          >
+            {STATUS_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+
+        {/* Tipo select */}
+        <select
+          value={filtroTipo}
+          onChange={(e) => { setFiltroTipo(e.target.value); setPag(0); }}
+          className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none"
+        >
+          <option value="">Todos os tipos</option>
+          {Object.entries(TIPO_TAREFA).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </select>
+
+        {/* Etiquetas */}
+        <button
+          onClick={() => setModalEtiquetas(true)}
+          className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm text-foreground transition hover:bg-muted"
+        >
+          <Tag className="h-3.5 w-3.5" />
+          Etiquetas
+        </button>
+
+        <div className="flex-1" />
+
+        {/* Right actions */}
+        <button className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm text-foreground transition hover:bg-muted">
+          <Download className="h-3.5 w-3.5" />
+          Exportar
+        </button>
+        <button
+          onClick={() => setModalEtiquetas(true)}
+          className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm text-foreground transition hover:bg-muted"
+        >
+          <Settings2 className="h-3.5 w-3.5" />
+          Gerenciar
+        </button>
+        <button
+          onClick={() => setModalCriar(true)}
+          className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-medium text-background transition hover:opacity-90"
+        >
+          <Plus className="h-4 w-4" />
+          Nova Tarefa
+        </button>
       </div>
 
       {isLoading ? (
@@ -364,19 +343,19 @@ export default function TarefasPage() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="w-10 px-3 py-3">
-                      <div className="h-4 w-4 rounded-full border border-[hsl(var(--task-brand))]" />
+                      <div className="h-4 w-4 rounded-full border border-muted-foreground/40" />
                     </th>
-                    <th className="w-10 px-3 py-3 text-left text-base font-medium text-muted-foreground">#</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Título</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Tipo</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Processo</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">P. Contrária</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Cliente</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Comarca</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Vencimento</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Fatal</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Equipe</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Responsável</th>
+                    <th className="w-10 px-3 py-3 text-left text-xs font-medium text-muted-foreground">#</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Título</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Tipo</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Processo</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">P. Contrária</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Cliente</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Comarca</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Vencimento</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Fatal</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Equipe</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Responsável</th>
                     <th className="w-10" />
                   </tr>
                 </thead>
@@ -404,18 +383,18 @@ export default function TarefasPage() {
                             className={cn(
                               "flex h-5 w-5 items-center justify-center rounded-full border transition",
                               t.status === "concluida"
-                                ? "border-[hsl(var(--task-accent-success))] bg-[hsl(var(--task-accent-success))] text-[hsl(var(--task-brand-foreground))]"
-                                : "border-[hsl(var(--task-brand))] hover:opacity-70",
+                                ? "border-[hsl(var(--task-accent-success))] bg-[hsl(var(--task-accent-success))] text-background"
+                                : "border-muted-foreground/40 hover:border-foreground",
                             )}
                           >
                             {t.status === "concluida" && <Check className="h-3 w-3" />}
                           </button>
                         </td>
 
-                        <td className="px-3 py-3 text-base text-muted-foreground">{rowNum}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{rowNum}</td>
 
-                        <td className="min-w-[210px] px-3 py-3">
-                          <p className="text-[1.5rem] font-semibold leading-tight text-foreground">{t.titulo}</p>
+                        <td className="min-w-[200px] px-3 py-3">
+                          <p className="text-sm font-medium text-foreground">{t.titulo}</p>
                           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                             <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold", st.pill)}>
                               {STATUS_LABELS[visualStatus]}
@@ -432,19 +411,19 @@ export default function TarefasPage() {
                           </div>
                         </td>
 
-                        <td className="whitespace-nowrap px-3 py-3 text-base text-muted-foreground">
+                        <td className="whitespace-nowrap px-3 py-3 text-xs text-muted-foreground">
                           {TIPO_TAREFA[t.tipo as keyof typeof TIPO_TAREFA] || t.tipo}
                         </td>
-                        <td className="max-w-[180px] truncate px-3 py-3 text-base text-muted-foreground">{t.intimacao_id || "—"}</td>
-                        <td className="max-w-[220px] px-3 py-3 text-base text-muted-foreground">{t.parte_contraria || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.cliente_nome || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.comarca || "—"}</td>
+                        <td className="max-w-[180px] truncate px-3 py-3 text-xs text-muted-foreground">{t.intimacao_id || "—"}</td>
+                        <td className="max-w-[220px] px-3 py-3 text-xs text-muted-foreground">{t.parte_contraria || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.cliente_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.comarca || "—"}</td>
 
-                        <td className={cn("whitespace-nowrap px-3 py-3 text-base", isVencida(t) ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground")}>
+                        <td className={cn("whitespace-nowrap px-3 py-3 text-xs", isVencida(t) ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground")}>
                           {t.data_vencimento ? (
                             <>
                               {formatDate(t.data_vencimento)}
-                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && <span className="block text-sm">{t.hora_vencimento}</span>}
+                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && <span className="block text-[11px]">{t.hora_vencimento}</span>}
                             </>
                           ) : (
                             "—"
@@ -453,15 +432,15 @@ export default function TarefasPage() {
 
                         <td
                           className={cn(
-                            "whitespace-nowrap px-3 py-3 text-base",
+                            "whitespace-nowrap px-3 py-3 text-xs",
                             fatalAtrasado ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground",
                           )}
                         >
                           {formatDate(t.prazo_fatal)}
                         </td>
 
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.equipe_nome || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.responsavel_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.equipe_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.responsavel_nome || "—"}</td>
 
                         <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                           <div className="relative group/menu">
@@ -504,38 +483,25 @@ export default function TarefasPage() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-base text-muted-foreground">
-            <span>
-              {startItem}-{endItem} de {filtered.length}
-            </span>
+          <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+            <span>{startItem}-{endItem} de {filtered.length}</span>
             <div className="flex items-center gap-2">
               <select
                 value={porPag}
-                onChange={(e) => {
-                  setPorPag(Number(e.target.value));
-                  setPag(0);
-                }}
-                className="h-10 min-w-[80px] rounded-xl border border-border bg-background px-3 text-base text-foreground outline-none"
+                onChange={(e) => { setPorPag(Number(e.target.value)); setPag(0); }}
+                className="h-9 rounded-lg border border-border bg-background px-2 text-sm text-foreground outline-none"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
               </select>
-              <button
-                onClick={() => setPag(Math.max(0, pag - 1))}
-                disabled={pag === 0}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
-              >
+              <button onClick={() => setPag(Math.max(0, pag - 1))} disabled={pag === 0}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <span className="text-base text-muted-foreground">
-                {pag + 1} / {totalPages || 1}
-              </span>
-              <button
-                onClick={() => setPag(Math.min(totalPages - 1, pag + 1))}
-                disabled={pag >= totalPages - 1}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
-              >
+              <span className="text-sm">{pag + 1} / {totalPages || 1}</span>
+              <button onClick={() => setPag(Math.min(totalPages - 1, pag + 1))} disabled={pag >= totalPages - 1}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -545,7 +511,7 @@ export default function TarefasPage() {
 
       <button
         onClick={() => setModalCriar(true)}
-        className="fixed bottom-20 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(var(--task-brand))] text-[hsl(var(--task-brand-foreground))] shadow-lg md:hidden"
+        className="fixed bottom-20 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg md:hidden"
       >
         <Plus className="h-6 w-6" />
       </button>
