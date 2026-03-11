@@ -315,6 +315,7 @@ export default function TarefasPage() {
             </button>
           </div>
         </div>
+        <p className="mt-1 text-right text-sm text-muted-foreground">{filtered.length} tarefas</p>
       </div>
 
       {isLoading ? (
