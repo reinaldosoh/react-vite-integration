@@ -572,11 +572,7 @@ export default function HomePage() {
           return;
         }
 
-        // Se a busca no CNJ retornou zero resultados, não tenta sincronizar do EasyPanel
-        if (status.zero_resultados) {
-          setZeroResultados(true);
-          return;
-        }
+        // Mesmo quando zero_resultados, tenta sincronizar via fallback (pode ter dados de busca anterior no servidor)
 
         try {
           const filtrosBusca = {
