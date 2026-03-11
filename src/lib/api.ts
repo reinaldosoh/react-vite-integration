@@ -114,76 +114,13 @@ export async function deletarIntimacao(id: string): Promise<{ ok: boolean; erro?
   return { ok: true }
 }
 
-// ── Sync TODAS: busca /api/todas do EasyPanel, insere no Supabase só as que faltam
-export async function sincronizarTodasRemoto(filters?: {
-  oab?: string;
-  data_inicio?: string;
-  data_fim?: string;
-}): Promise<SyncResult> {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Não autenticado')
-
-  const remotoBruto: Intimacao[] = await callProxy('todas')
-  const oabFiltro = normalizeOab(filters?.oab)
-
-  // Se não há OAB válida para filtrar, rejeitar para evitar importar dados de outros usuários
-  if (!oabFiltro) {
-    throw new Error('OAB inválida para sincronização')
+// ── Limpar arquivo de resultado no EasyPanel após sync ─────────────────────
+export async function limparResultadoRemoto(arquivo: string): Promise<void> {
+  try {
+    await callProxy('deletar', { arquivo })
+  } catch {
+    // não é crítico se falhar
   }
-
-  const remoto = (remotoBruto || []).filter((i) => {
-    const oabItem = normalizeOab(i._oab || i.oab)
-    const matchOab = oabItem === oabFiltro
-    const matchData = isWithinDateRange(i.data_disponibilizacao, filters?.data_inicio, filters?.data_fim)
-    return matchOab && matchData
-  })
-
-  if (remoto.length === 0) {
-    return { novas: 0, duplicadas: 0, duplicadasList: [] }
-  }
-
-  const { data: existentes } = await supabase
-    .from('intimacoes')
-    .select('numero_processo, tribunal, data_disponibilizacao, orgao')
-
-  const chavesExistentes = new Set(
-    (existentes || []).map((e) =>
-      `${e.numero_processo}|${e.tribunal}|${e.data_disponibilizacao}|${e.orgao}`
-    )
-  )
-
-  const novas: Intimacao[] = []
-  const duplicadasList: string[] = []
-
-  for (const i of remoto) {
-    const chave = `${i.numero_processo}|${i.tribunal || ''}|${i.data_disponibilizacao || ''}|${i.orgao || ''}`
-    if (chavesExistentes.has(chave)) {
-      duplicadasList.push(i.numero_processo)
-    } else {
-      novas.push(i)
-    }
-  }
-
-  if (novas.length > 0) {
-    const rows = novas.map((i) => ({
-      user_id: user.id,
-      numero_processo: i.numero_processo || '',
-      orgao: i.orgao || null,
-      data_disponibilizacao: i.data_disponibilizacao || null,
-      tipo_comunicacao: i.tipo_comunicacao || null,
-      meio: i.meio || null,
-      partes: i.partes || null,
-      advogados: i.advogados || null,
-      inteiro_teor: i.inteiro_teor || null,
-      tribunal: i.tribunal || null,
-      oab: i._oab || i.oab || null,
-    }))
-
-    const { error } = await supabase.from('intimacoes').insert(rows)
-    if (error) throw new Error(error.message)
-  }
-
-  return { novas: novas.length, duplicadas: duplicadasList.length, duplicadasList }
 }
 
 // ── Sync arquivo específico: compara EasyPanel com Supabase, insere SÓ novas
