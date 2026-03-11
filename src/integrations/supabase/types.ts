@@ -14,6 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      clientes: {
+        Row: {
+          created_at: string | null
+          documento: string | null
+          email: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      compromissos: {
+        Row: {
+          categoria: string
+          cliente_id: string | null
+          created_at: string | null
+          data: string
+          data_fim_recorrencia: string | null
+          descricao: string | null
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          intimacao_id: string | null
+          lembrete_ativo: boolean | null
+          lembretes: Json | null
+          link_reuniao: string | null
+          local: string | null
+          recorrente: boolean | null
+          tipo_recorrencia: string | null
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          categoria?: string
+          cliente_id?: string | null
+          created_at?: string | null
+          data: string
+          data_fim_recorrencia?: string | null
+          descricao?: string | null
+          hora_fim: string
+          hora_inicio: string
+          id?: string
+          intimacao_id?: string | null
+          lembrete_ativo?: boolean | null
+          lembretes?: Json | null
+          link_reuniao?: string | null
+          local?: string | null
+          recorrente?: boolean | null
+          tipo_recorrencia?: string | null
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          categoria?: string
+          cliente_id?: string | null
+          created_at?: string | null
+          data?: string
+          data_fim_recorrencia?: string | null
+          descricao?: string | null
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          intimacao_id?: string | null
+          lembrete_ativo?: boolean | null
+          lembretes?: Json | null
+          link_reuniao?: string | null
+          local?: string | null
+          recorrente?: boolean | null
+          tipo_recorrencia?: string | null
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compromissos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compromissos_intimacao_id_fkey"
+            columns: ["intimacao_id"]
+            isOneToOne: false
+            referencedRelation: "intimacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cron_configs: {
         Row: {
           enabled: boolean | null
