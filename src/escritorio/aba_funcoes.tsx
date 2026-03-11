@@ -16,9 +16,9 @@ export function AbaFuncoes() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">{funcoes.length} função(ões)</p>
+        <p className="text-sm text-muted-foreground">{funcoes.length} função(ões) cadastrada(s)</p>
         <button onClick={() => setModal({ nome: "", salario_base: 0 })}
-          className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 transition active:scale-95 flex items-center gap-1.5">
+          className="bg-foreground text-background px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition active:scale-95 flex items-center gap-1.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           Nova Função
         </button>
