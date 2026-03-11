@@ -177,7 +177,7 @@ export default function TarefasPage() {
   const startItem = filtered.length === 0 ? 0 : pag * porPag + 1;
   const endItem = Math.min((pag + 1) * porPag, filtered.length);
 
-  const cards: Array<{ label: string; count: number; tone: CardTone; icon: React.ComponentType<{ className?: string }> }> = [
+  const cards: Array<{ label: string; count: number; tone: CardTone; icon: (props: { className?: string }) => JSX.Element }> = [
     { label: "A Vencer", count: resumo.aVencer, tone: "warning", icon: Clock3 },
     { label: "Prazo do dia", count: resumo.prazoHoje, tone: "info", icon: CalendarClock },
     { label: "Vencidas", count: resumo.vencidas, tone: "danger", icon: AlertTriangle },
