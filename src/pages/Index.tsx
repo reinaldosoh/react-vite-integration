@@ -573,13 +573,25 @@ export default function HomePage() {
         }
 
         try {
+          const filtrosBusca = {
+            oab: ultimaBuscaRef.current?.oab,
+            data_inicio: ultimaBuscaRef.current?.data_inicio,
+            data_fim: ultimaBuscaRef.current?.data_fim,
+          };
+
           const sync = status.arquivo_resultado
-            ? await sincronizarNovasIntimacoes(status.arquivo_resultado)
-            : await sincronizarTodasRemoto({
-                oab: ultimaBuscaRef.current?.oab,
-                data_inicio: ultimaBuscaRef.current?.data_inicio,
-                data_fim: ultimaBuscaRef.current?.data_fim,
-              });
+            ? await (async () => {
+                try {
+                  return await sincronizarNovasIntimacoes(status.arquivo_resultado, filtrosBusca);
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : "";
+                  if (msg.includes("RESULTADO_DIVERGENTE_DA_BUSCA")) {
+                    return await sincronizarTodasRemoto(filtrosBusca);
+                  }
+                  throw e;
+                }
+              })()
+            : await sincronizarTodasRemoto(filtrosBusca);
 
           await carregarTodas();
 

@@ -182,15 +182,40 @@ export async function sincronizarTodasRemoto(filters?: {
 }
 
 // ── Sync arquivo específico: compara EasyPanel com Supabase, insere SÓ novas
-export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncResult> {
+export async function sincronizarNovasIntimacoes(
+  arquivo: string,
+  filters?: {
+    oab?: string;
+    data_inicio?: string;
+    data_fim?: string;
+  }
+): Promise<SyncResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Não autenticado')
 
   const resultado = await fetchArquivoEspecifico(arquivo)
+  const consulta = resultado.consulta || {}
   const intimacoesRemoto = resultado.intimacoes || []
-  const oab = resultado.consulta?.oab || ''
 
-  if (intimacoesRemoto.length === 0) {
+  const oabEsperada = normalizeOab(filters?.oab)
+  const oabConsulta = normalizeOab(consulta.oab)
+
+  if (oabEsperada && oabConsulta && oabEsperada !== oabConsulta) {
+    throw new Error('RESULTADO_DIVERGENTE_DA_BUSCA')
+  }
+
+  const oabFiltro = oabEsperada || oabConsulta
+  const dataInicioFiltro = filters?.data_inicio || consulta.data_inicio
+  const dataFimFiltro = filters?.data_fim || consulta.data_fim
+
+  const intimacoesFiltradas = intimacoesRemoto.filter((i) => {
+    const oabItem = normalizeOab(i._oab || i.oab || consulta.oab)
+    const matchOab = oabFiltro ? oabItem === oabFiltro : true
+    const matchData = isWithinDateRange(i.data_disponibilizacao, dataInicioFiltro, dataFimFiltro)
+    return matchOab && matchData
+  })
+
+  if (intimacoesFiltradas.length === 0) {
     return { novas: 0, duplicadas: 0, duplicadasList: [] }
   }
 
@@ -207,7 +232,7 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
   const novas: Intimacao[] = []
   const duplicadasList: string[] = []
 
-  for (const i of intimacoesRemoto) {
+  for (const i of intimacoesFiltradas) {
     const chave = `${i.numero_processo}|${i.tribunal || ''}|${i.data_disponibilizacao || ''}`
     if (chavesExistentes.has(chave)) {
       duplicadasList.push(i.numero_processo)
@@ -228,7 +253,7 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
       advogados: i.advogados || null,
       inteiro_teor: i.inteiro_teor || null,
       tribunal: i.tribunal || null,
-      oab: oab || null,
+      oab: i._oab || i.oab || consulta.oab || null,
     }))
 
     const { error } = await supabase.from('intimacoes').insert(rows)
