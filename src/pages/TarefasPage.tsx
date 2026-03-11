@@ -411,19 +411,19 @@ export default function TarefasPage() {
                           </div>
                         </td>
 
-                        <td className="whitespace-nowrap px-3 py-3 text-base text-muted-foreground">
+                        <td className="whitespace-nowrap px-3 py-3 text-xs text-muted-foreground">
                           {TIPO_TAREFA[t.tipo as keyof typeof TIPO_TAREFA] || t.tipo}
                         </td>
-                        <td className="max-w-[180px] truncate px-3 py-3 text-base text-muted-foreground">{t.intimacao_id || "—"}</td>
-                        <td className="max-w-[220px] px-3 py-3 text-base text-muted-foreground">{t.parte_contraria || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.cliente_nome || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.comarca || "—"}</td>
+                        <td className="max-w-[180px] truncate px-3 py-3 text-xs text-muted-foreground">{t.intimacao_id || "—"}</td>
+                        <td className="max-w-[220px] px-3 py-3 text-xs text-muted-foreground">{t.parte_contraria || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.cliente_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.comarca || "—"}</td>
 
-                        <td className={cn("whitespace-nowrap px-3 py-3 text-base", isVencida(t) ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground")}>
+                        <td className={cn("whitespace-nowrap px-3 py-3 text-xs", isVencida(t) ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground")}>
                           {t.data_vencimento ? (
                             <>
                               {formatDate(t.data_vencimento)}
-                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && <span className="block text-sm">{t.hora_vencimento}</span>}
+                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && <span className="block text-[11px]">{t.hora_vencimento}</span>}
                             </>
                           ) : (
                             "—"
@@ -432,15 +432,15 @@ export default function TarefasPage() {
 
                         <td
                           className={cn(
-                            "whitespace-nowrap px-3 py-3 text-base",
+                            "whitespace-nowrap px-3 py-3 text-xs",
                             fatalAtrasado ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground",
                           )}
                         >
                           {formatDate(t.prazo_fatal)}
                         </td>
 
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.equipe_nome || "—"}</td>
-                        <td className="px-3 py-3 text-base text-muted-foreground">{t.responsavel_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.equipe_nome || "—"}</td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.responsavel_nome || "—"}</td>
 
                         <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                           <div className="relative group/menu">
