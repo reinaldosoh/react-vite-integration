@@ -5,7 +5,7 @@ import {
   fetchTodasIntimacoes,
   iniciarBusca,
   fetchStatus,
-  sincronizarTodasRemoto,
+  sincronizarNovasIntimacoes,
   deletarIntimacao,
   type Intimacao,
 } from "@/lib/api";
