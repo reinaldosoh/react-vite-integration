@@ -68,20 +68,28 @@ export default function TarefasPage() {
   const totalPages = Math.ceil(filtered.length / POR_PAG);
 
   const cards = [
-    { label: "A Vencer", count: resumo.aVencer, bg: "bg-blue-50", text: "text-blue-600" },
-    { label: "Prazo Hoje", count: resumo.prazoHoje, bg: "bg-amber-50", text: "text-amber-600" },
-    { label: "Vencidas", count: resumo.vencidas, bg: "bg-red-50", text: "text-red-600" },
-    { label: "Concluídas", count: resumo.concluidas, bg: "bg-green-50", text: "text-green-600" },
+    { label: "A Vencer", count: resumo.aVencer, border: "border-b-orange-400" },
+    { label: "Prazo do dia", count: resumo.prazoHoje, border: "border-b-blue-500" },
+    { label: "Vencidas", count: resumo.vencidas, border: "border-b-red-500" },
+    { label: "Concluídas", count: resumo.concluidas, border: "border-b-green-500" },
   ];
 
   return (
     <div className="fade-in">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Lista de Tarefas</h1>
+          <p className="text-sm text-muted-foreground mt-1">Gerencie suas tarefas processuais e administrativas</p>
+        </div>
+      </div>
+
       {/* Cards resumo */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {cards.map(c => (
-          <div key={c.label} className={`${c.bg} rounded-xl p-4 border`}>
-            <p className="text-xs text-gray-500 font-medium">{c.label}</p>
-            <p className={`text-2xl font-bold ${c.text} mt-1`}>{c.count}</p>
+          <div key={c.label} className={`bg-card rounded-xl border border-b-[3px] ${c.border} p-4`}>
+            <p className="text-xs text-muted-foreground font-medium">{c.label}</p>
+            <p className="text-2xl font-bold text-foreground mt-1">{c.count}</p>
           </div>
         ))}
       </div>
