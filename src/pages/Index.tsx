@@ -572,12 +572,25 @@ export default function HomePage() {
           return;
         }
 
+        // Se a busca no CNJ retornou zero resultados, não tenta sincronizar do EasyPanel
+        if (status.zero_resultados) {
+          setZeroResultados(true);
+          return;
+        }
+
         try {
           const filtrosBusca = {
             oab: ultimaBuscaRef.current?.oab,
             data_inicio: ultimaBuscaRef.current?.data_inicio,
             data_fim: ultimaBuscaRef.current?.data_fim,
           };
+
+          // Validação: não sincronizar se OAB não contém dígitos
+          const oabDigits = (filtrosBusca.oab || '').replace(/\D/g, '');
+          if (!oabDigits) {
+            setErro('OAB inválida. Verifique o campo e tente novamente.');
+            return;
+          }
 
           const sync = status.arquivo_resultado
             ? await (async () => {
