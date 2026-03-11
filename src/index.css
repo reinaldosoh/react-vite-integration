@@ -36,6 +36,24 @@
   --sidebar-accent-foreground: 240 5.9% 10%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 217.2 91.2% 59.8%;
+
+  --task-brand: 347 74% 35%;
+  --task-brand-foreground: 0 0% 100%;
+  --task-accent-warning: 36 95% 51%;
+  --task-accent-info: 218 84% 57%;
+  --task-accent-danger: 0 82% 58%;
+  --task-accent-success: 142 68% 44%;
+  --task-accent-purple: 262 82% 64%;
+  --task-soft-warning: 38 100% 96%;
+  --task-soft-warning-border: 38 91% 87%;
+  --task-soft-info: 220 100% 96%;
+  --task-soft-info-border: 220 86% 88%;
+  --task-soft-danger: 0 100% 97%;
+  --task-soft-danger-border: 0 93% 90%;
+  --task-soft-success: 142 62% 95%;
+  --task-soft-success-border: 142 43% 85%;
+  --task-soft-purple: 264 100% 97%;
+  --task-soft-purple-border: 263 88% 90%;
 }
 
 .dark {
