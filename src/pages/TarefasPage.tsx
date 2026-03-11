@@ -343,19 +343,19 @@ export default function TarefasPage() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="w-10 px-3 py-3">
-                      <div className="h-4 w-4 rounded-full border border-[hsl(var(--task-brand))]" />
+                      <div className="h-4 w-4 rounded-full border border-muted-foreground/40" />
                     </th>
-                    <th className="w-10 px-3 py-3 text-left text-base font-medium text-muted-foreground">#</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Título</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Tipo</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Processo</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">P. Contrária</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Cliente</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Comarca</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Vencimento</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Fatal</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Equipe</th>
-                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Responsável</th>
+                    <th className="w-10 px-3 py-3 text-left text-xs font-medium text-muted-foreground">#</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Título</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Tipo</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Processo</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">P. Contrária</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Cliente</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Comarca</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Vencimento</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Fatal</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Equipe</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground">Responsável</th>
                     <th className="w-10" />
                   </tr>
                 </thead>
