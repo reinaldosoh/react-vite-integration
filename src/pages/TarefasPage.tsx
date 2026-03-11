@@ -483,38 +483,25 @@ export default function TarefasPage() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-base text-muted-foreground">
-            <span>
-              {startItem}-{endItem} de {filtered.length}
-            </span>
+          <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+            <span>{startItem}-{endItem} de {filtered.length}</span>
             <div className="flex items-center gap-2">
               <select
                 value={porPag}
-                onChange={(e) => {
-                  setPorPag(Number(e.target.value));
-                  setPag(0);
-                }}
-                className="h-10 min-w-[80px] rounded-xl border border-border bg-background px-3 text-base text-foreground outline-none"
+                onChange={(e) => { setPorPag(Number(e.target.value)); setPag(0); }}
+                className="h-9 rounded-lg border border-border bg-background px-2 text-sm text-foreground outline-none"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
               </select>
-              <button
-                onClick={() => setPag(Math.max(0, pag - 1))}
-                disabled={pag === 0}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
-              >
+              <button onClick={() => setPag(Math.max(0, pag - 1))} disabled={pag === 0}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <span className="text-base text-muted-foreground">
-                {pag + 1} / {totalPages || 1}
-              </span>
-              <button
-                onClick={() => setPag(Math.min(totalPages - 1, pag + 1))}
-                disabled={pag >= totalPages - 1}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
-              >
+              <span className="text-sm">{pag + 1} / {totalPages || 1}</span>
+              <button onClick={() => setPag(Math.min(totalPages - 1, pag + 1))} disabled={pag >= totalPages - 1}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -524,7 +511,7 @@ export default function TarefasPage() {
 
       <button
         onClick={() => setModalCriar(true)}
-        className="fixed bottom-20 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(var(--task-brand))] text-[hsl(var(--task-brand-foreground))] shadow-lg md:hidden"
+        className="fixed bottom-20 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-background shadow-lg md:hidden"
       >
         <Plus className="h-6 w-6" />
       </button>
