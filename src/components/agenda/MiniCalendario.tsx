@@ -14,44 +14,73 @@ export default function MiniCalendario({ currentDate, onSelectDate }: Props) {
   const monthLabel = currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
   function prevMonth() {
-    const d = new Date(year, month - 1, 1);
-    onSelectDate(d);
+    onSelectDate(new Date(year, month - 1, 1));
   }
   function nextMonth() {
-    const d = new Date(year, month + 1, 1);
-    onSelectDate(d);
+    onSelectDate(new Date(year, month + 1, 1));
   }
 
   return (
-    <div className="bg-white rounded-xl border p-4">
-      <div className="flex items-center justify-between mb-3">
-        <button onClick={prevMonth} className="p-1 hover:bg-gray-100 rounded-lg active:scale-95">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+    <div className="select-none">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <button
+          onClick={prevMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition active:scale-90"
+        >
+          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
-        <span className="text-xs font-semibold text-gray-700 capitalize">{monthLabel}</span>
-        <button onClick={nextMonth} className="p-1 hover:bg-gray-100 rounded-lg active:scale-95">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <span className="text-sm font-semibold text-gray-800 capitalize tracking-tight">
+          {monthLabel.replace(/^./, c => c.toUpperCase())}
+        </span>
+        <button
+          onClick={nextMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition active:scale-90"
+        >
+          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-0.5 text-center">
+
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 mb-1">
         {WEEKDAYS.map((w, i) => (
-          <span key={i} className="text-[10px] text-gray-400 font-medium py-1">{w}</span>
+          <div key={i} className="flex items-center justify-center h-8">
+            <span className="text-xs font-medium text-gray-400">{w}</span>
+          </div>
         ))}
-        {cells.map((cell, i) => (
-          <button
-            key={i}
-            disabled={!cell}
-            onClick={() => cell && onSelectDate(cell)}
-            className={`text-[11px] w-7 h-7 rounded-lg transition font-medium ${
-              !cell ? "" :
-              isToday(cell) ? "bg-gray-900 text-white" :
-              isSameDay(cell, currentDate) ? "bg-gray-200 text-gray-900" :
-              "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            {cell?.getDate() || ""}
-          </button>
-        ))}
+      </div>
+
+      {/* Days grid */}
+      <div className="grid grid-cols-7">
+        {cells.map((cell, i) => {
+          if (!cell) {
+            return <div key={i} className="h-9" />;
+          }
+
+          const today = isToday(cell);
+          const selected = !today && isSameDay(cell, currentDate);
+
+          return (
+            <div key={i} className="flex items-center justify-center h-9">
+              <button
+                onClick={() => onSelectDate(cell)}
+                className={`w-8 h-8 rounded-full text-[13px] font-medium transition-all duration-150 ${
+                  today
+                    ? "bg-gray-900 text-white shadow-sm"
+                    : selected
+                    ? "bg-gray-100 text-gray-900 ring-1 ring-gray-300"
+                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                }`}
+              >
+                {cell.getDate()}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
