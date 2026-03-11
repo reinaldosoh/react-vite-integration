@@ -547,6 +547,7 @@ export default function HomePage() {
   const [erro, setErro] = useState<string | null>(null);
   const [zeroResultados, setZeroResultados] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showMais, setShowMais] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function handleLogout() { await supabase.auth.signOut(); navigate("/login"); }
