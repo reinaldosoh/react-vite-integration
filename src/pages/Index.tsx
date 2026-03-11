@@ -34,7 +34,7 @@ function toSortDate(d?: string) {
 }
 
 type FiltroTab = "todas" | "novas" | "visualizadas";
-type MainView = "home" | "detalhe" | "cron" | "agenda" | "clientes";
+type MainView = "home" | "detalhe" | "cron" | "agenda" | "clientes" | "escritorio" | "tarefas";
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function Toast({ msg, onHide }: { msg: string; onHide: () => void }) {
