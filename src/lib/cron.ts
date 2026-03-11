@@ -69,7 +69,7 @@ export async function saveCronSlots(slots: CronSlot[]): Promise<{ ok: boolean; e
     slot_index: s.slot_index,
     enabled: s.enabled,
     hora: s.hora,
-    oabs: s.oabs as unknown as Record<string, unknown>[],
+    oabs: JSON.parse(JSON.stringify(s.oabs)),
     updated_at: new Date().toISOString(),
   }))
 
