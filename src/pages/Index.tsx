@@ -678,6 +678,10 @@ export default function HomePage() {
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-4 md:py-6 pb-24 md:pb-6">
         {view === "cron" ? (
           <CronPage />
+        ) : view === "agenda" ? (
+          <AgendaPage intimacoes={intimacoes} />
+        ) : view === "clientes" ? (
+          <ClientesPage />
         ) : (
           <>
             {showBusca && <PainelBusca onClose={() => setShowBusca(false)} onBuscar={handleBuscar} loading={loading} />}
