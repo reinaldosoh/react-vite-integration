@@ -41,6 +41,42 @@ async function callProxy(action: string, payload?: Record<string, unknown>) {
   return res.data
 }
 
+function normalizeOab(value?: string) {
+  return (value || '').replace(/\D/g, '')
+}
+
+function toDateKey(value?: string): number | null {
+  if (!value) return null
+
+  // yyyy-mm-dd
+  if (value.includes('-')) {
+    const [y, m, d] = value.split('-').map(Number)
+    if (!y || !m || !d) return null
+    return Date.UTC(y, m - 1, d)
+  }
+
+  // dd/mm/yyyy
+  if (value.includes('/')) {
+    const [d, m, y] = value.split('/').map(Number)
+    if (!y || !m || !d) return null
+    return Date.UTC(y, m - 1, d)
+  }
+
+  return null
+}
+
+function isWithinDateRange(dateValue?: string, start?: string, end?: string) {
+  const current = toDateKey(dateValue)
+  if (current === null) return false
+
+  const startKey = toDateKey(start)
+  const endKey = toDateKey(end)
+
+  if (startKey !== null && current < startKey) return false
+  if (endKey !== null && current > endKey) return false
+  return true
+}
+
 export async function iniciarBusca(payload: {
   oab: string;
   uf_oab: string;

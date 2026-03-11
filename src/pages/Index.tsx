@@ -550,6 +550,7 @@ export default function HomePage() {
   const [toast, setToast] = useState<string | null>(null);
   const [showMais, setShowMais] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ultimaBuscaRef = useRef<{ oab: string; data_inicio: string; data_fim: string } | null>(null);
 
   async function handleLogout() { await supabase.auth.signOut(); navigate("/login"); }
 
