@@ -5,7 +5,7 @@ import {
   fetchTodasIntimacoes,
   iniciarBusca,
   fetchStatus,
-  sincronizarTodasRemoto,
+  sincronizarNovasIntimacoes,
   deletarIntimacao,
   type Intimacao,
 } from "@/lib/api";
@@ -566,14 +566,16 @@ export default function HomePage() {
         if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
         setLoading(false);
         if (status.erro) { setErro(status.erro); }
-        else {
+        else if (status.arquivo_resultado) {
           try {
-            const sync = await sincronizarTodasRemoto();
+            const sync = await sincronizarNovasIntimacoes(status.arquivo_resultado);
             await carregarTodas();
             if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
             else if (sync.duplicadas > 0) showToastMsg(`Todas as ${sync.duplicadas} intimação(ões) já existem.`);
             else setZeroResultados(true);
           } catch { await carregarTodas(); setZeroResultados(true); }
+        } else {
+          setZeroResultados(true);
         }
       }
     } catch { /* ignora erros de polling */ }
