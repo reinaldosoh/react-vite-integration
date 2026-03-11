@@ -139,11 +139,11 @@ export async function sincronizarTodasRemoto(filters?: {
 
   const { data: existentes } = await supabase
     .from('intimacoes')
-    .select('numero_processo, tribunal, data_disponibilizacao')
+    .select('numero_processo, tribunal, data_disponibilizacao, orgao')
 
   const chavesExistentes = new Set(
     (existentes || []).map((e) =>
-      `${e.numero_processo}|${e.tribunal}|${e.data_disponibilizacao}`
+      `${e.numero_processo}|${e.tribunal}|${e.data_disponibilizacao}|${e.orgao}`
     )
   )
 
@@ -151,7 +151,7 @@ export async function sincronizarTodasRemoto(filters?: {
   const duplicadasList: string[] = []
 
   for (const i of remoto) {
-    const chave = `${i.numero_processo}|${i.tribunal || ''}|${i.data_disponibilizacao || ''}`
+    const chave = `${i.numero_processo}|${i.tribunal || ''}|${i.data_disponibilizacao || ''}|${i.orgao || ''}`
     if (chavesExistentes.has(chave)) {
       duplicadasList.push(i.numero_processo)
     } else {
