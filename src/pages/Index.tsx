@@ -576,7 +576,15 @@ export default function HomePage() {
             else setZeroResultados(true);
           } catch { await carregarTodas(); setZeroResultados(true); }
         } else {
-          setZeroResultados(true);
+          // arquivo_resultado é null — EasyPanel pode ter considerado tudo duplicado internamente
+          // Tenta sincronizar via /api/todas como fallback
+          try {
+            const sync = await sincronizarTodasRemoto();
+            await carregarTodas();
+            if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
+            else if (sync.duplicadas > 0) showToastMsg(`Todas as ${sync.duplicadas} intimação(ões) já existem no sistema.`);
+            else setZeroResultados(true);
+          } catch { await carregarTodas(); setZeroResultados(true); }
         }
       }
     } catch { /* ignora erros de polling */ }
