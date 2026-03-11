@@ -47,6 +47,92 @@ export type Database = {
         }
         Relationships: []
       }
+      colaboradores: {
+        Row: {
+          acesso_sistema: boolean
+          ativo: boolean
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          cpf: string | null
+          created_at: string | null
+          data_nascimento: string | null
+          email: string | null
+          estado: string | null
+          estado_civil: string | null
+          funcao_id: string | null
+          id: string
+          logradouro: string | null
+          nome: string
+          nome_mae: string | null
+          nome_pai: string | null
+          numero: string | null
+          observacoes: string | null
+          sexo: string | null
+          telefone: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          acesso_sistema?: boolean
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          data_nascimento?: string | null
+          email?: string | null
+          estado?: string | null
+          estado_civil?: string | null
+          funcao_id?: string | null
+          id?: string
+          logradouro?: string | null
+          nome: string
+          nome_mae?: string | null
+          nome_pai?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          sexo?: string | null
+          telefone?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          acesso_sistema?: boolean
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          data_nascimento?: string | null
+          email?: string | null
+          estado?: string | null
+          estado_civil?: string | null
+          funcao_id?: string | null
+          id?: string
+          logradouro?: string | null
+          nome?: string
+          nome_mae?: string | null
+          nome_pai?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          sexo?: string | null
+          telefone?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_funcao_id_fkey"
+            columns: ["funcao_id"]
+            isOneToOne: false
+            referencedRelation: "funcoes_escritorio"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compromissos: {
         Row: {
           categoria: string
@@ -203,6 +289,126 @@ export type Database = {
         }
         Relationships: []
       }
+      equipes: {
+        Row: {
+          ativa: boolean
+          created_at: string | null
+          id: string
+          meta: number
+          nome: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ativa?: boolean
+          created_at?: string | null
+          id?: string
+          meta?: number
+          nome: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ativa?: boolean
+          created_at?: string | null
+          id?: string
+          meta?: number
+          nome?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      equipes_colaboradores: {
+        Row: {
+          colaborador_id: string
+          created_at: string | null
+          equipe_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string | null
+          equipe_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string | null
+          equipe_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipes_colaboradores_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipes_colaboradores_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      etiquetas_tarefas: {
+        Row: {
+          cor: string
+          created_at: string | null
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string | null
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string | null
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      funcoes_escritorio: {
+        Row: {
+          created_at: string | null
+          id: string
+          nome: string
+          salario_base: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nome: string
+          salario_base?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nome?: string
+          salario_base?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       intimacoes: {
         Row: {
           advogados: string[] | null
@@ -250,6 +456,178 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      logs_tarefas: {
+        Row: {
+          campo: string | null
+          created_at: string | null
+          id: string
+          nome_usuario: string | null
+          tarefa_id: string
+          user_id: string
+          valor_anterior: string | null
+          valor_novo: string | null
+        }
+        Insert: {
+          campo?: string | null
+          created_at?: string | null
+          id?: string
+          nome_usuario?: string | null
+          tarefa_id: string
+          user_id: string
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Update: {
+          campo?: string | null
+          created_at?: string | null
+          id?: string
+          nome_usuario?: string | null
+          tarefa_id?: string
+          user_id?: string
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_tarefas_tarefa_id_fkey"
+            columns: ["tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tarefas: {
+        Row: {
+          cliente_id: string | null
+          comarca: string | null
+          created_at: string | null
+          data_vencimento: string | null
+          descricao: string | null
+          equipe_id: string | null
+          estado: string | null
+          hora_vencimento: string
+          id: string
+          intimacao_id: string | null
+          parte_contraria: string | null
+          prazo_fatal: string | null
+          responsavel_id: string | null
+          status: string
+          tipo: string
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          comarca?: string | null
+          created_at?: string | null
+          data_vencimento?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          estado?: string | null
+          hora_vencimento?: string
+          id?: string
+          intimacao_id?: string | null
+          parte_contraria?: string | null
+          prazo_fatal?: string | null
+          responsavel_id?: string | null
+          status?: string
+          tipo?: string
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cliente_id?: string | null
+          comarca?: string | null
+          created_at?: string | null
+          data_vencimento?: string | null
+          descricao?: string | null
+          equipe_id?: string | null
+          estado?: string | null
+          hora_vencimento?: string
+          id?: string
+          intimacao_id?: string | null
+          parte_contraria?: string | null
+          prazo_fatal?: string | null
+          responsavel_id?: string | null
+          status?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_intimacao_id_fkey"
+            columns: ["intimacao_id"]
+            isOneToOne: false
+            referencedRelation: "intimacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tarefas_etiquetas: {
+        Row: {
+          created_at: string | null
+          etiqueta_id: string
+          id: string
+          tarefa_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          etiqueta_id: string
+          id?: string
+          tarefa_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          etiqueta_id?: string
+          id?: string
+          tarefa_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_etiquetas_etiqueta_id_fkey"
+            columns: ["etiqueta_id"]
+            isOneToOne: false
+            referencedRelation: "etiquetas_tarefas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_etiquetas_tarefa_id_fkey"
+            columns: ["tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
