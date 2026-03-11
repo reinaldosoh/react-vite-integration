@@ -12,6 +12,8 @@ import {
 import CronPage from "@/pages/CronPage";
 import AgendaPage from "@/pages/AgendaPage";
 import ClientesPage from "@/pages/ClientesPage";
+import EscritorioPage from "@/pages/EscritorioPage";
+import TarefasPage from "@/pages/TarefasPage";
 import DatePicker from "@/components/DatePicker";
 
 // ─── Helpers de leitura/não-lida (localStorage) ───────────────────────────────
