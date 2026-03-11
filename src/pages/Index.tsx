@@ -625,10 +625,16 @@ export default function HomePage() {
   }, []);
 
   async function handleBuscar(oab: string, uf: string, inicio: string, fim: string) {
+    // Validar que OAB contém apenas dígitos
+    const oabClean = oab.trim().replace(/\D/g, '');
+    if (!oabClean) {
+      showToastMsg('OAB inválida. Digite apenas números.');
+      return;
+    }
     setShowBusca(false); setLoading(true); setErro(null); setLogBusca("Iniciando...\n");
-    ultimaBuscaRef.current = { oab: oab.trim(), data_inicio: inicio, data_fim: fim };
+    ultimaBuscaRef.current = { oab: oabClean, data_inicio: inicio, data_fim: fim };
     try {
-      const data = await iniciarBusca({ oab, uf_oab: uf, data_inicio: inicio, data_fim: fim });
+      const data = await iniciarBusca({ oab: oabClean, uf_oab: uf, data_inicio: inicio, data_fim: fim });
       if (data.erro) { setErro(data.erro); setLoading(false); return; }
       pollingRef.current = setInterval(pollStatus, 1500);
     } catch (e: unknown) { setErro(e instanceof Error ? e.message : "Erro desconhecido"); setLoading(false); }
