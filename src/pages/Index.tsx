@@ -575,7 +575,11 @@ export default function HomePage() {
         try {
           const sync = status.arquivo_resultado
             ? await sincronizarNovasIntimacoes(status.arquivo_resultado)
-            : await sincronizarTodasRemoto();
+            : await sincronizarTodasRemoto({
+                oab: ultimaBuscaRef.current?.oab,
+                data_inicio: ultimaBuscaRef.current?.data_inicio,
+                data_fim: ultimaBuscaRef.current?.data_fim,
+              });
 
           await carregarTodas();
 
