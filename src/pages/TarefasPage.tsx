@@ -68,20 +68,28 @@ export default function TarefasPage() {
   const totalPages = Math.ceil(filtered.length / POR_PAG);
 
   const cards = [
-    { label: "A Vencer", count: resumo.aVencer, bg: "bg-blue-50", text: "text-blue-600" },
-    { label: "Prazo Hoje", count: resumo.prazoHoje, bg: "bg-amber-50", text: "text-amber-600" },
-    { label: "Vencidas", count: resumo.vencidas, bg: "bg-red-50", text: "text-red-600" },
-    { label: "Concluídas", count: resumo.concluidas, bg: "bg-green-50", text: "text-green-600" },
+    { label: "A Vencer", count: resumo.aVencer, border: "border-b-orange-400" },
+    { label: "Prazo do dia", count: resumo.prazoHoje, border: "border-b-blue-500" },
+    { label: "Vencidas", count: resumo.vencidas, border: "border-b-red-500" },
+    { label: "Concluídas", count: resumo.concluidas, border: "border-b-green-500" },
   ];
 
   return (
     <div className="fade-in">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Lista de Tarefas</h1>
+          <p className="text-sm text-muted-foreground mt-1">Gerencie suas tarefas processuais e administrativas</p>
+        </div>
+      </div>
+
       {/* Cards resumo */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {cards.map(c => (
-          <div key={c.label} className={`${c.bg} rounded-xl p-4 border`}>
-            <p className="text-xs text-gray-500 font-medium">{c.label}</p>
-            <p className={`text-2xl font-bold ${c.text} mt-1`}>{c.count}</p>
+          <div key={c.label} className={`bg-card rounded-xl border border-b-[3px] ${c.border} p-4`}>
+            <p className="text-xs text-muted-foreground font-medium">{c.label}</p>
+            <p className="text-2xl font-bold text-foreground mt-1">{c.count}</p>
           </div>
         ))}
       </div>
@@ -89,33 +97,33 @@ export default function TarefasPage() {
       {/* Filtros */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <input type="text" placeholder="Buscar tarefa..." value={busca} onChange={e => setBusca(e.target.value)}
-          className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none w-48" />
+          className="px-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-ring focus:border-transparent outline-none w-48 bg-background" />
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
           {(["ativas", "todas", "a_fazer", "em_andamento", "concluida", "reagendada", "cancelada"] as FiltroStatus[]).map(s => (
             <button key={s} onClick={() => { setFiltroStatus(s); setPag(0); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition ${filtroStatus === s ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"}`}>
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition ${filtroStatus === s ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground"}`}>
               {s === "ativas" ? "Ativas" : s === "todas" ? "Todas" : STATUS_TAREFA[s as StatusTarefa]?.label || s}
             </button>
           ))}
         </div>
         <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPag(0); }}
-          className="px-3 py-1.5 border rounded-xl text-xs bg-white">
+          className="px-3 py-1.5 border border-border rounded-xl text-xs bg-background">
           <option value="">Todos os tipos</option>
           {Object.entries(TIPO_TAREFA).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
         {etiquetas.length > 0 && (
           <select value={filtroEtiqueta} onChange={e => { setFiltroEtiqueta(e.target.value); setPag(0); }}
-            className="px-3 py-1.5 border rounded-xl text-xs bg-white">
+            className="px-3 py-1.5 border border-border rounded-xl text-xs bg-background">
             <option value="">Todas etiquetas</option>
             {etiquetas.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
           </select>
         )}
         <div className="ml-auto flex gap-2">
-          <button onClick={() => setModalEtiquetas(true)} className="px-3 py-2 rounded-xl border text-sm text-gray-500 hover:bg-gray-50 transition active:scale-95">
+          <button onClick={() => setModalEtiquetas(true)} className="px-3 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition active:scale-95">
             Etiquetas
           </button>
           <button onClick={() => setModalCriar(true)}
-            className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 transition active:scale-95 flex items-center gap-1.5">
+            className="bg-foreground text-background px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition active:scale-95 flex items-center gap-1.5">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             Nova Tarefa
           </button>
