@@ -605,59 +605,53 @@ export default function HomePage() {
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
       <header className="bg-white border-b sticky top-0 z-30 hidden md:block">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => { setView("home"); setShowBusca(false); }}>
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">J</span>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => { setView("home"); setShowBusca(false); }}>
+              <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">J</span>
+              </div>
+              <span className="font-semibold text-foreground text-sm">JurisRapido</span>
             </div>
-            <span className="font-semibold text-gray-900 text-sm">JurisRapido</span>
-          </div>
-          <nav className="flex items-center gap-1">
-            <button onClick={() => { setView("home"); setShowBusca(false); }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "home" || view === "detalhe" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              Intimações
-            </button>
-            <button onClick={() => setView("agenda")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "agenda" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              Agenda
-            </button>
-            <button onClick={() => setView("clientes")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "clientes" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              Clientes
-            </button>
-            <button onClick={() => setView("cron")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "cron" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              Alertas
-            </button>
-            <button onClick={() => setView("escritorio")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "escritorio" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-              Equipe
-            </button>
-            <button onClick={() => setView("tarefas")}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${view === "tarefas" ? "bg-gray-100 text-gray-900" : "text-gray-400 hover:text-gray-600"}`}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-              Tarefas
-            </button>
-          </nav>
-          <div className="flex items-center gap-2">
-            {(view === "home" || view === "detalhe") && (
-              <button onClick={() => setShowBusca((v) => !v)}
-                className="bg-black text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                Nova Busca
+            <div className="flex items-center gap-2">
+              {(view === "home" || view === "detalhe") && (
+                <button onClick={() => setShowBusca((v) => !v)}
+                  className="bg-foreground text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 transition flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  Nova Busca
+                </button>
+              )}
+              <button onClick={handleLogout}
+                className="border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                Sair
               </button>
-            )}
-            <button onClick={handleLogout}
-              className="border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-              Sair
-            </button>
+            </div>
           </div>
+          <nav className="flex items-center gap-0 -mb-px overflow-x-auto no-scrollbar">
+            {[
+              { key: "home" as MainView, match: ["home", "detalhe"], label: "Intimações", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", badge: totalNovas },
+              { key: "agenda" as MainView, match: ["agenda"], label: "Agenda", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+              { key: "clientes" as MainView, match: ["clientes"], label: "Clientes", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+              { key: "cron" as MainView, match: ["cron"], label: "Alertas", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+              { key: "escritorio" as MainView, match: ["escritorio"], label: "Escritório", icon: "M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
+              { key: "tarefas" as MainView, match: ["tarefas"], label: "Tarefas", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
+            ].map(item => {
+              const active = item.match.includes(view);
+              return (
+                <button key={item.key} onClick={() => { setView(item.key === "home" ? "home" : item.key); setShowBusca(false); }}
+                  className={`relative flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition whitespace-nowrap border-b-2 ${active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"}`}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} /></svg>
+                  {item.label}
+                  {item.badge && item.badge > 0 && (
+                    <span className="ml-1 min-w-[18px] h-[18px] bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                      {item.badge > 9 ? "9+" : item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </div>
       </header>
 
