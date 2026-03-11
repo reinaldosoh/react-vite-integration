@@ -383,8 +383,8 @@ export default function TarefasPage() {
                             className={cn(
                               "flex h-5 w-5 items-center justify-center rounded-full border transition",
                               t.status === "concluida"
-                                ? "border-[hsl(var(--task-accent-success))] bg-[hsl(var(--task-accent-success))] text-[hsl(var(--task-brand-foreground))]"
-                                : "border-[hsl(var(--task-brand))] hover:opacity-70",
+                                ? "border-[hsl(var(--task-accent-success))] bg-[hsl(var(--task-accent-success))] text-background"
+                                : "border-muted-foreground/40 hover:border-foreground",
                             )}
                           >
                             {t.status === "concluida" && <Check className="h-3 w-3" />}
