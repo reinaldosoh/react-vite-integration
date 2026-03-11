@@ -1,11 +1,12 @@
 import { getMonthDays, isToday, isSameDay } from "@/lib/agenda-utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   currentDate: Date;
   onSelectDate: (d: Date) => void;
 }
 
-const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
+const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
 
 export default function MiniCalendario({ currentDate, onSelectDate }: Props) {
   const year = currentDate.getFullYear();
@@ -20,64 +21,91 @@ export default function MiniCalendario({ currentDate, onSelectDate }: Props) {
     onSelectDate(new Date(year, month + 1, 1));
   }
 
+  // Find which week row the current date is in to highlight the row
+  const dayOfMonth = currentDate.getDate();
+  const firstDayIndex = cells.findIndex(c => c && c.getDate() === 1);
+  const selectedIndex = cells.findIndex(c => c && isSameDay(c, currentDate));
+  const selectedRow = selectedIndex >= 0 ? Math.floor(selectedIndex / 7) : -1;
+
+  // Group cells into rows
+  const rows: (Date | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    rows.push(cells.slice(i, i + 7));
+  }
+
   return (
     <div className="select-none">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 px-1">
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-5">
         <button
           onClick={prevMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition active:scale-90"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition active:scale-90"
         >
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm font-semibold text-gray-800 capitalize tracking-tight">
-          {monthLabel.replace(/^./, c => c.toUpperCase())}
+        <span className="text-sm font-semibold text-foreground capitalize tracking-tight">
+          {monthLabel}
         </span>
         <button
           onClick={nextMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition active:scale-90"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition active:scale-90"
         >
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7 mb-2">
         {WEEKDAYS.map((w, i) => (
-          <div key={i} className="flex items-center justify-center h-8">
-            <span className="text-xs font-medium text-gray-400">{w}</span>
+          <div key={i} className="flex items-center justify-center">
+            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{w}</span>
           </div>
         ))}
       </div>
 
-      {/* Days grid */}
-      <div className="grid grid-cols-7">
-        {cells.map((cell, i) => {
-          if (!cell) {
-            return <div key={i} className="h-9" />;
-          }
-
-          const today = isToday(cell);
-          const selected = !today && isSameDay(cell, currentDate);
-
+      {/* Days grid - row by row */}
+      <div className="space-y-0.5">
+        {rows.map((row, rowIdx) => {
+          const isSelectedRow = rowIdx === selectedRow;
           return (
-            <div key={i} className="flex items-center justify-center h-9">
-              <button
-                onClick={() => onSelectDate(cell)}
-                className={`w-8 h-8 rounded-full text-[13px] font-medium transition-all duration-150 ${
-                  today
-                    ? "bg-gray-900 text-white shadow-sm"
-                    : selected
-                    ? "bg-gray-100 text-gray-900 ring-1 ring-gray-300"
-                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                }`}
-              >
-                {cell.getDate()}
-              </button>
+            <div
+              key={rowIdx}
+              className={`grid grid-cols-7 rounded-lg transition-colors ${
+                isSelectedRow ? "bg-primary/10" : ""
+              }`}
+            >
+              {row.map((cell, colIdx) => {
+                if (!cell) {
+                  return (
+                    <div key={colIdx} className="flex items-center justify-center h-9">
+                      <span className="text-[13px] text-muted-foreground/30 font-medium" />
+                    </div>
+                  );
+                }
+
+                const today = isToday(cell);
+                const selected = isSameDay(cell, currentDate);
+                const isCurrentMonth = cell.getMonth() === month;
+
+                return (
+                  <div key={colIdx} className="flex items-center justify-center h-9">
+                    <button
+                      onClick={() => onSelectDate(cell)}
+                      className={`w-8 h-8 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                        today
+                          ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                          : selected
+                          ? "bg-primary/20 text-primary font-semibold"
+                          : isCurrentMonth
+                          ? "text-foreground hover:bg-muted active:bg-muted/80"
+                          : "text-muted-foreground/40"
+                      }`}
+                    >
+                      {cell.getDate()}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           );
         })}
