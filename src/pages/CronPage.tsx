@@ -6,8 +6,8 @@ import {
   DEFAULT_SLOTS,
   type CronSlot,
   type CronLog,
-} from '../lib/cron'
-import TimePicker from '../components/TimePicker'
+} from '@/lib/cron'
+import TimePicker from '@/components/TimePicker'
 
 // ── Toggle Switch ──────────────────────────────────────────────────────────────
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
@@ -71,7 +71,6 @@ function SlotCard({ slot, onChange }: { slot: CronSlot; onChange: (updated: Cron
 
   return (
     <div className={`bg-white rounded-xl border transition-all ${slot.enabled ? 'border-gray-900 shadow-sm' : 'border-gray-200'}`}>
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-colors flex-shrink-0 ${slot.enabled ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-400'}`}>
@@ -90,7 +89,6 @@ function SlotCard({ slot, onChange }: { slot: CronSlot; onChange: (updated: Cron
         <Toggle enabled={slot.enabled} onChange={(v) => onChange({ ...slot, enabled: v })} />
       </div>
 
-      {/* Body */}
       {slot.enabled && (
         <div className="px-4 pb-4 border-t bg-gray-50/50 pt-4 space-y-4">
           <TimePicker
@@ -228,11 +226,9 @@ function LogsTable({ logs, loading }: { logs: CronLog[]; loading: boolean }) {
 
   return (
     <>
-      {/* Mobile: card list */}
       <div className="md:hidden space-y-2 p-4">
         {logs.map((log, i) => <LogCard key={log.id || i} log={log} />)}
       </div>
-      {/* Desktop: table */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -322,7 +318,6 @@ export default function CronPage() {
 
   return (
     <div className="fade-in">
-      {/* Page header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex-1 min-w-0">
           <h2 className="text-base font-bold text-gray-900">Alertas Automáticos</h2>
@@ -358,7 +353,6 @@ export default function CronPage() {
         </button>
       </div>
 
-      {/* Error feedback */}
       {saveResult?.ok === false && (
         <div className="mb-4 flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-xs text-red-700">
           <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -368,7 +362,6 @@ export default function CronPage() {
         </div>
       )}
 
-      {/* Info banner */}
       <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 mb-5 text-xs text-emerald-700">
         <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -379,7 +372,6 @@ export default function CronPage() {
         </p>
       </div>
 
-      {/* Slots */}
       {loadingConfig ? (
         <div className="space-y-3 mb-6">
           {[0, 1, 2].map((i) => <div key={i} className="bg-white rounded-xl border h-20 animate-pulse" />)}
@@ -390,7 +382,6 @@ export default function CronPage() {
         </div>
       )}
 
-      {/* Logs */}
       <div className="bg-white rounded-xl border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-4 border-b">
           <div>

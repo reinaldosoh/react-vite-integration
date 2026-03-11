@@ -71,7 +71,6 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Sele
     }
   }, [open])
 
-  // Lock body scroll on mobile when open
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = ''
@@ -90,7 +89,6 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Sele
 
   const calendarContent = (
     <>
-      {/* Header nav */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
         <button type="button" onClick={prevMonth} className="p-2 -m-1 hover:bg-gray-200 rounded-lg transition active:scale-95">
           <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,13 +102,11 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Sele
           </svg>
         </button>
       </div>
-      {/* Weekdays */}
       <div className="grid grid-cols-7 px-3 pt-3">
         {DIAS_SEMANA.map((d, i) => (
           <div key={i} className="text-center text-[10px] font-semibold text-gray-400 uppercase py-1">{d}</div>
         ))}
       </div>
-      {/* Days */}
       <div className="grid grid-cols-7 px-3 pb-3 gap-y-0.5">
         {cells.map((cell, i) => {
           const isSelected = selected && isSameDay(cell.date, selected)
@@ -132,7 +128,6 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Sele
           )
         })}
       </div>
-      {/* Footer */}
       <div className="border-t px-4 py-3 flex justify-between items-center">
         <button type="button" onClick={() => setOpen(false)} className="text-sm text-gray-400 font-medium">Cancelar</button>
         <button type="button" onClick={() => pick(today)} className="text-sm font-semibold text-gray-900 bg-gray-100 px-4 py-1.5 rounded-lg active:bg-gray-200">Hoje</button>
@@ -161,14 +156,12 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Sele
 
       {open && (
         <>
-          {/* Mobile: bottom sheet */}
           <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/40" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
             <div className="bg-white rounded-t-2xl slide-up max-h-[85vh] overflow-hidden" style={{ paddingBottom: 'var(--safe-bottom)' }}>
               <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1" />
               {calendarContent}
             </div>
           </div>
-          {/* Desktop: dropdown */}
           <div className="hidden md:block absolute z-50 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl w-[300px] overflow-hidden fade-in">
             {calendarContent}
           </div>

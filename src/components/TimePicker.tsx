@@ -67,7 +67,6 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
   const pickerContent = (
     <>
       <div className="flex flex-1 min-h-0">
-        {/* Hours */}
         <div ref={hoursRef} className="w-20 border-r overflow-y-auto no-scrollbar">
           <div className="px-2 py-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider sticky top-0 bg-white z-10">Hora</div>
           {HOURS.map(h => (
@@ -84,7 +83,6 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
             </button>
           ))}
         </div>
-        {/* Minutes */}
         <div className="flex-1 p-3 overflow-y-auto no-scrollbar">
           <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Minuto</div>
           <div className="grid grid-cols-4 gap-2">
@@ -133,14 +131,12 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
 
       {open && (
         <>
-          {/* Mobile: bottom sheet */}
           <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/40" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
             <div className="bg-white rounded-t-2xl slide-up flex flex-col max-h-[60vh]" style={{ paddingBottom: 'var(--safe-bottom)' }}>
               <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1" />
               {pickerContent}
             </div>
           </div>
-          {/* Desktop: dropdown */}
           <div className="hidden md:flex flex-col absolute z-50 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl w-[280px] h-[320px] overflow-hidden fade-in">
             {pickerContent}
           </div>

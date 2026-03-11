@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from '@/integrations/supabase/client'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -48,15 +48,14 @@ export async function loadCronSlots(): Promise<CronSlot[]> {
     return DEFAULT_SLOTS.map(s => ({ ...s }))
   }
 
-  // Preenche slots que não existem no banco com defaults
   return DEFAULT_SLOTS.map((def) => {
     const row = data.find((r) => r.slot_index === def.slot_index)
     if (!row) return { ...def }
     return {
       slot_index: row.slot_index,
-      enabled: row.enabled,
+      enabled: row.enabled ?? false,
       hora: row.hora,
-      oabs: (row.oabs as OabEntry[]) || [],
+      oabs: (row.oabs as unknown as OabEntry[]) || [],
     }
   })
 }
@@ -65,13 +64,12 @@ export async function saveCronSlots(slots: CronSlot[]): Promise<{ ok: boolean; e
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, erro: 'Não autenticado' }
 
-  // Upsert todos os slots
   const rows = slots.map((s) => ({
     user_id: user.id,
     slot_index: s.slot_index,
     enabled: s.enabled,
     hora: s.hora,
-    oabs: s.oabs,
+    oabs: JSON.parse(JSON.stringify(s.oabs)),
     updated_at: new Date().toISOString(),
   }))
 
@@ -81,14 +79,13 @@ export async function saveCronSlots(slots: CronSlot[]): Promise<{ ok: boolean; e
 
   if (error) return { ok: false, erro: error.message }
 
-  // Chama RPC para recriar os pg_cron jobs
   const { data: rpcData, error: rpcError } = await supabase.rpc('sync_user_cron_jobs', {
     p_user_id: user.id,
   })
 
   if (rpcError) return { ok: false, erro: `Config salva, mas erro ao sincronizar cron: ${rpcError.message}` }
 
-  const result = rpcData as { ok: boolean; jobs_created: number; erro?: string }
+  const result = rpcData as unknown as { ok: boolean; jobs_created: number; erro?: string }
   if (!result?.ok) return { ok: false, erro: result?.erro || 'Erro desconhecido na sincronização' }
 
   return { ok: true }
@@ -103,5 +100,5 @@ export async function fetchCronLogs(): Promise<CronLog[]> {
     .order('executed_at', { ascending: false })
     .limit(100)
   if (error) return []
-  return data || []
+  return (data || []) as unknown as CronLog[]
 }

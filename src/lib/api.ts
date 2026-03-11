@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from '@/integrations/supabase/client'
 
 const PROXY_FN = 'api-proxy'
 
@@ -137,7 +137,6 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Não autenticado')
 
-  // 1. Busca o arquivo específico do EasyPanel
   const resultado = await fetchArquivoEspecifico(arquivo)
   const intimacoesRemoto = resultado.intimacoes || []
   const oab = resultado.consulta?.oab || ''
@@ -146,7 +145,6 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
     return { novas: 0, duplicadas: 0, duplicadasList: [] }
   }
 
-  // 2. Busca as chaves existentes no Supabase
   const { data: existentes } = await supabase
     .from('intimacoes')
     .select('numero_processo, tribunal, data_disponibilizacao')
@@ -157,7 +155,6 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
     )
   )
 
-  // 3. Separa novas vs duplicadas
   const novas: Intimacao[] = []
   const duplicadasList: string[] = []
 
@@ -170,7 +167,6 @@ export async function sincronizarNovasIntimacoes(arquivo: string): Promise<SyncR
     }
   }
 
-  // 4. Insere SOMENTE as novas no Supabase
   if (novas.length > 0) {
     const rows = novas.map((i) => ({
       user_id: user.id,
