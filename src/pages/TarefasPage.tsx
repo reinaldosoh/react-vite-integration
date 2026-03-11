@@ -1,35 +1,124 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTarefas, useEtiquetas, useLogsTarefa } from "@/tarefas/hooks";
 import { useClientes } from "@/hooks/useClientes";
 import { useEquipes, useColaboradores } from "@/escritorio/hooks";
 import { STATUS_TAREFA, TIPO_TAREFA, type Tarefa, type StatusTarefa, type Etiqueta } from "@/tarefas/tipos_tarefas";
 import { UF_OPTIONS } from "@/escritorio/tipos_escritorio";
-import { ClipboardList, Plus, Tag, Check, RotateCcw, Trash2, Pencil, X, ArrowRight, Search, RefreshCw, MoreHorizontal, ChevronLeft, ChevronRight, Filter, Diamond } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Ban,
+  CalendarClock,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Clock3,
+  Download,
+  Filter,
+  Hourglass,
+  ListChecks,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Repeat2,
+  RotateCcw,
+  Search,
+  Settings2,
+  Tag,
+  Trash2,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-type FiltroStatus = "ativas" | "todas" | StatusTarefa;
+type FiltroStatus = "ativas" | "todas" | "aguardando" | StatusTarefa;
+type VisualStatus = StatusTarefa | "vencida" | "aguardando";
+type CardTone = "warning" | "info" | "danger" | "success" | "purple";
+
+const CARD_BAR_CLASS: Record<CardTone, string> = {
+  warning: "bg-[hsl(var(--task-accent-warning))]",
+  info: "bg-[hsl(var(--task-accent-info))]",
+  danger: "bg-[hsl(var(--task-accent-danger))]",
+  success: "bg-[hsl(var(--task-accent-success))]",
+  purple: "bg-[hsl(var(--task-accent-purple))]",
+};
+
+const STATUS_VISUAL: Record<VisualStatus, { rowBorder: string; pill: string }> = {
+  a_fazer: {
+    rowBorder: "border-l-[hsl(var(--task-accent-warning))]",
+    pill: "border-[hsl(var(--task-soft-warning-border))] bg-[hsl(var(--task-soft-warning))] text-[hsl(var(--task-accent-warning))]",
+  },
+  em_andamento: {
+    rowBorder: "border-l-[hsl(var(--task-accent-info))]",
+    pill: "border-[hsl(var(--task-soft-info-border))] bg-[hsl(var(--task-soft-info))] text-[hsl(var(--task-accent-info))]",
+  },
+  concluida: {
+    rowBorder: "border-l-[hsl(var(--task-accent-success))]",
+    pill: "border-[hsl(var(--task-soft-success-border))] bg-[hsl(var(--task-soft-success))] text-[hsl(var(--task-accent-success))]",
+  },
+  reagendada: {
+    rowBorder: "border-l-[hsl(var(--task-accent-info))]",
+    pill: "border-[hsl(var(--task-soft-info-border))] bg-[hsl(var(--task-soft-info))] text-[hsl(var(--task-accent-info))]",
+  },
+  cancelada: {
+    rowBorder: "border-l-[hsl(var(--task-accent-danger))]",
+    pill: "border-[hsl(var(--task-soft-danger-border))] bg-[hsl(var(--task-soft-danger))] text-[hsl(var(--task-accent-danger))]",
+  },
+  vencida: {
+    rowBorder: "border-l-[hsl(var(--task-accent-danger))]",
+    pill: "border-[hsl(var(--task-soft-danger-border))] bg-[hsl(var(--task-soft-danger))] text-[hsl(var(--task-accent-danger))]",
+  },
+  aguardando: {
+    rowBorder: "border-l-[hsl(var(--task-accent-purple))]",
+    pill: "border-[hsl(var(--task-soft-purple-border))] bg-[hsl(var(--task-soft-purple))] text-[hsl(var(--task-accent-purple))]",
+  },
+};
+
+const STATUS_LABELS: Record<VisualStatus, string> = {
+  a_fazer: "A Fazer",
+  em_andamento: "Em Andamento",
+  concluida: "Concluída",
+  reagendada: "Reagendada",
+  cancelada: "Cancelada",
+  vencida: "Vencida",
+  aguardando: "Aguardando",
+};
+
+const STATUS_FILTER_OPTIONS: Array<{ value: FiltroStatus; label: string }> = [
+  { value: "ativas", label: "Ativas" },
+  { value: "todas", label: "Todas" },
+  { value: "a_fazer", label: "A Fazer" },
+  { value: "em_andamento", label: "Em Andamento" },
+  { value: "concluida", label: "Concluída" },
+  { value: "reagendada", label: "Reagendada" },
+  { value: "cancelada", label: "Cancelada" },
+  { value: "aguardando", label: "Aguardando" },
+];
 
 function formatDate(d?: string | null) {
   if (!d) return "—";
-  const dt = new Date(d + "T00:00:00");
+  const dt = new Date(`${d}T00:00:00`);
   return dt.toLocaleDateString("pt-BR");
-}
-
-function formatDateTime(d?: string | null, h?: string) {
-  if (!d) return "—";
-  const dt = new Date(d + "T00:00:00");
-  const dateStr = dt.toLocaleDateString("pt-BR");
-  if (h && h !== "23:59") return `${dateStr}\n${h}`;
-  return dateStr;
 }
 
 function isVencida(t: Tarefa) {
   if (!t.data_vencimento || ["concluida", "cancelada"].includes(t.status)) return false;
-  return new Date(t.data_vencimento + "T" + t.hora_vencimento) < new Date();
+  return new Date(`${t.data_vencimento}T${t.hora_vencimento || "23:59"}`) < new Date();
 }
 
 function isHoje(t: Tarefa) {
   if (!t.data_vencimento) return false;
   return t.data_vencimento === new Date().toISOString().slice(0, 10);
+}
+
+function getVisualStatus(t: Tarefa): VisualStatus {
+  if (isVencida(t)) return "vencida";
+  if (t.status === "aguardando") return "aguardando";
+  if (t.status in STATUS_VISUAL) return t.status as VisualStatus;
+  return "a_fazer";
 }
 
 export default function TarefasPage() {
@@ -50,270 +139,359 @@ export default function TarefasPage() {
   const [porPag, setPorPag] = useState(25);
 
   const resumo = useMemo(() => {
-    const ativas = tarefas.filter(t => !["concluida", "cancelada"].includes(t.status));
+    const ativas = tarefas.filter((t) => !["concluida", "cancelada"].includes(t.status));
     return {
-      aVencer: ativas.filter(t => t.data_vencimento && !isVencida(t) && !isHoje(t)).length,
-      prazoHoje: ativas.filter(t => isHoje(t)).length,
-      vencidas: ativas.filter(t => isVencida(t)).length,
-      concluidas: tarefas.filter(t => t.status === "concluida").length,
-      canceladas: tarefas.filter(t => t.status === "cancelada").length,
-      reagendadas: tarefas.filter(t => t.status === "reagendada").length,
+      aVencer: ativas.filter((t) => t.data_vencimento && !isVencida(t) && !isHoje(t)).length,
+      prazoHoje: ativas.filter((t) => isHoje(t)).length,
+      vencidas: ativas.filter((t) => isVencida(t)).length,
+      concluidas: tarefas.filter((t) => t.status === "concluida").length,
+      canceladas: tarefas.filter((t) => t.status === "cancelada").length,
+      reagendadas: tarefas.filter((t) => t.status === "reagendada").length,
+      aguardando: tarefas.filter((t) => t.status === "aguardando").length,
     };
   }, [tarefas]);
 
   const filtered = useMemo(() => {
     let f = [...tarefas];
-    if (filtroStatus === "ativas") f = f.filter(t => !["concluida", "cancelada"].includes(t.status));
-    else if (filtroStatus !== "todas") f = f.filter(t => t.status === filtroStatus);
-    if (filtroTipo) f = f.filter(t => t.tipo === filtroTipo);
-    if (filtroEtiqueta) f = f.filter(t => t.etiquetas?.some(e => e.id === filtroEtiqueta));
+    if (filtroStatus === "ativas") {
+      f = f.filter((t) => !["concluida", "cancelada"].includes(t.status));
+    } else if (filtroStatus !== "todas") {
+      f = f.filter((t) => t.status === filtroStatus);
+    }
+    if (filtroTipo) f = f.filter((t) => t.tipo === filtroTipo);
+    if (filtroEtiqueta) f = f.filter((t) => t.etiquetas?.some((e) => e.id === filtroEtiqueta));
     if (busca) {
       const q = busca.toLowerCase();
-      f = f.filter(t => [t.titulo, t.descricao, t.cliente_nome, t.parte_contraria].filter(Boolean).join(" ").toLowerCase().includes(q));
+      f = f.filter((t) =>
+        [t.titulo, t.descricao, t.cliente_nome, t.parte_contraria, t.comarca]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      );
     }
     return f;
   }, [tarefas, filtroStatus, filtroTipo, filtroEtiqueta, busca]);
 
   const paginated = filtered.slice(pag * porPag, (pag + 1) * porPag);
   const totalPages = Math.ceil(filtered.length / porPag);
-  const startItem = pag * porPag + 1;
+  const startItem = filtered.length === 0 ? 0 : pag * porPag + 1;
   const endItem = Math.min((pag + 1) * porPag, filtered.length);
 
-  const cards = [
-    { label: "A Vencer", count: resumo.aVencer, barColor: "bg-orange-400" },
-    { label: "Prazo do dia", count: resumo.prazoHoje, barColor: "bg-blue-500" },
-    { label: "Vencidas", count: resumo.vencidas, barColor: "bg-red-500" },
-    { label: "Concluídas", count: resumo.concluidas, barColor: "bg-green-500" },
-    { label: "Canceladas", count: resumo.canceladas, barColor: "bg-red-800" },
-    { label: "Reagendadas", count: resumo.reagendadas, barColor: "bg-blue-400" },
+  const cards: Array<{ label: string; count: number; tone: CardTone; icon: LucideIcon }> = [
+    { label: "A Vencer", count: resumo.aVencer, tone: "warning", icon: Clock3 },
+    { label: "Prazo do dia", count: resumo.prazoHoje, tone: "info", icon: CalendarClock },
+    { label: "Vencidas", count: resumo.vencidas, tone: "danger", icon: AlertTriangle },
+    { label: "Concluídas", count: resumo.concluidas, tone: "success", icon: ListChecks },
+    { label: "Canceladas", count: resumo.canceladas, tone: "danger", icon: Ban },
+    { label: "Reagendadas", count: resumo.reagendadas, tone: "info", icon: Repeat2 },
+    { label: "Aguardando", count: resumo.aguardando, tone: "purple", icon: Hourglass },
   ];
 
   return (
-    <div className="fade-in">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+    <div className="fade-in space-y-5">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Lista de Tarefas</h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerencie suas tarefas processuais e administrativas</p>
+          <h1 className="text-[2rem] font-semibold leading-tight text-foreground">Lista de Tarefas</h1>
+          <p className="mt-1 text-[1.35rem] text-muted-foreground">Gerencie suas tarefas processuais e administrativas</p>
         </div>
-        <button onClick={() => window.location.reload()}
-          className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition">
-          <RefreshCw className="w-4 h-4" />
+        <button
+          onClick={() => window.location.reload()}
+          className="hidden md:inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-base text-foreground transition hover:bg-muted"
+        >
+          <RefreshCw className="h-4 w-4" />
           Atualizar
         </button>
       </div>
 
-      {/* Cards resumo - horizontal scroll on mobile, grid on desktop */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 mb-6 -mx-1 px-1">
-        {cards.map(c => (
-          <div key={c.label} className="bg-card rounded-xl border min-w-[140px] flex-1 flex flex-col">
-            <div className="px-4 pt-4 pb-3">
-              <p className="text-xs text-muted-foreground mb-1">{c.label}</p>
-              <p className="text-2xl font-bold text-foreground">{c.count}</p>
+      <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/40 p-1">
+        <button className="rounded-lg bg-background px-4 py-1.5 text-base font-medium text-foreground shadow-sm">Minhas</button>
+        <button className="rounded-lg px-4 py-1.5 text-base text-muted-foreground">Gerais</button>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-7">
+        {cards.map((card, index) => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className="overflow-hidden rounded-xl border border-border bg-card">
+              <div className="flex items-start justify-between px-4 pb-3 pt-4">
+                <p className="text-base text-muted-foreground">{card.label}</p>
+                {index === 0 ? (
+                  <button className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    7 dias
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                ) : (
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-muted/70 text-muted-foreground">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                )}
+              </div>
+              <div className="px-4 pb-3 text-[2rem] font-semibold leading-none text-foreground">{card.count}</div>
+              <div className={cn("h-1 w-full", CARD_BAR_CLASS[card.tone])} />
             </div>
-            <div className={`h-1 rounded-b-xl ${c.barColor}`} />
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Barra de filtros */}
-      <div className="flex items-center gap-3 mb-5 flex-wrap">
-        {/* Busca */}
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" placeholder="Buscar tarefas..." value={busca} onChange={e => setBusca(e.target.value)}
-            className="pl-9 pr-3 py-2.5 border border-border rounded-lg text-sm w-56 bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent outline-none" />
-        </div>
+      <div className="rounded-xl border border-border bg-card p-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-1 flex-wrap items-center gap-2">
+            <div className="relative w-full min-w-[240px] flex-1 xl:max-w-[360px]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Buscar tarefas..."
+                value={busca}
+                onChange={(e) => {
+                  setBusca(e.target.value);
+                  setPag(0);
+                }}
+                className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-base text-foreground outline-none transition focus:ring-2 focus:ring-ring"
+              />
+            </div>
 
-        {/* Separador */}
-        <div className="h-8 w-px bg-border hidden md:block" />
+            <div className="relative">
+              <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <select
+                value={filtroStatus}
+                onChange={(e) => {
+                  setFiltroStatus(e.target.value as FiltroStatus);
+                  setPag(0);
+                }}
+                className="h-11 min-w-[140px] rounded-xl border border-border bg-background pl-9 pr-8 text-base text-foreground outline-none"
+              >
+                {STATUS_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Status filter chips */}
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
-          {(["ativas", "todas", "a_fazer", "em_andamento", "concluida", "reagendada", "cancelada"] as FiltroStatus[]).map(s => (
-            <button key={s} onClick={() => { setFiltroStatus(s); setPag(0); }}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition border ${filtroStatus === s
-                ? "bg-foreground text-background border-foreground"
-                : "bg-background text-foreground border-border hover:bg-muted"
-              }`}>
-              {s === "ativas" ? "Ativas" : s === "todas" ? "Todas" : STATUS_TAREFA[s as StatusTarefa]?.label || s}
+            <select
+              value={filtroTipo}
+              onChange={(e) => {
+                setFiltroTipo(e.target.value);
+                setPag(0);
+              }}
+              className="h-11 min-w-[170px] rounded-xl border border-border bg-background px-3 text-base text-foreground outline-none"
+            >
+              <option value="">Todos os tipos</option>
+              {Object.entries(TIPO_TAREFA).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => setModalEtiquetas(true)}
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted"
+            >
+              <Tag className="h-4 w-4" />
+              Etiquetas
             </button>
-          ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <button className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted">
+              <Download className="h-4 w-4" />
+              Exportar
+            </button>
+            <button
+              onClick={() => setModalEtiquetas(true)}
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-4 text-base text-foreground transition hover:bg-muted"
+            >
+              <Settings2 className="h-4 w-4" />
+              Gerenciar
+            </button>
+            <button
+              onClick={() => setModalCriar(true)}
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[hsl(var(--task-brand))] px-5 text-base font-semibold text-[hsl(var(--task-brand-foreground))] transition hover:opacity-95"
+            >
+              <Plus className="h-4 w-4" />
+              Nova Tarefa
+            </button>
+          </div>
         </div>
-
-        {/* Separador */}
-        <div className="h-8 w-px bg-border hidden md:block" />
-
-        {/* Tipo dropdown */}
-        <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPag(0); }}
-          className="px-3 py-2.5 border border-border rounded-lg text-sm bg-background text-foreground">
-          <option value="">Todos os tipos</option>
-          {Object.entries(TIPO_TAREFA).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-
-        {/* Etiquetas button */}
-        <button onClick={() => setModalEtiquetas(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition">
-          <Diamond className="w-3.5 h-3.5" />
-          Etiquetas
-        </button>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Nova Tarefa */}
-        <button onClick={() => setModalCriar(true)}
-          className="hidden md:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-medium hover:opacity-90 transition active:scale-[0.98]">
-          <Plus className="w-4 h-4" />
-          Nova Tarefa
-        </button>
+        <p className="mt-1 text-right text-sm text-muted-foreground">{filtered.length} tarefas</p>
       </div>
 
-      {/* Tabela */}
       {isLoading ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">Carregando...</div>
+        <div className="py-16 text-center text-sm text-muted-foreground">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <ClipboardList className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-          <p className="font-medium text-sm text-muted-foreground">Nenhuma tarefa encontrada</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">Tente ajustar os filtros ou crie uma nova tarefa</p>
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-border bg-card text-center">
+          <ClipboardList className="mb-3 h-12 w-12 text-muted-foreground/40" />
+          <p className="text-2xl font-semibold text-muted-foreground">Nenhuma tarefa encontrada</p>
+          <p className="mt-1 text-base text-muted-foreground">Tente ajustar os filtros ou crie uma nova tarefa</p>
         </div>
       ) : (
         <>
-          {/* Mobile cards */}
           <div className="md:hidden space-y-2">
-            {paginated.map((t, idx) => {
-              const st = STATUS_TAREFA[t.status as StatusTarefa] || STATUS_TAREFA.a_fazer;
+            {paginated.map((t) => {
+              const visualStatus = getVisualStatus(t);
+              const st = STATUS_VISUAL[visualStatus];
               return (
-                <div key={t.id} onClick={() => setModalEditar(t)}
-                  className={`bg-card rounded-xl border border-l-[3px] ${st.border} p-4 active:scale-[0.98] transition cursor-pointer`}>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{t.titulo}</p>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${st.cor}`}>{st.label}</span>
-                      {t.etiquetas?.map(e => (
-                        <span key={e.id} className="text-[10px] px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: e.cor }}>{e.nome}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground">
-                      <span>{TIPO_TAREFA[t.tipo as keyof typeof TIPO_TAREFA] || t.tipo}</span>
-                      {t.data_vencimento && (
-                        <span className={isVencida(t) ? "text-destructive font-medium" : ""}>{formatDate(t.data_vencimento)}</span>
-                      )}
-                      {t.responsavel_nome && <span>{t.responsavel_nome}</span>}
-                    </div>
+                <div
+                  key={t.id}
+                  onClick={() => setModalEditar(t)}
+                  className={cn("cursor-pointer rounded-xl border border-border bg-card p-4 border-l-[3px]", st.rowBorder)}
+                >
+                  <p className="text-base font-semibold text-foreground">{t.titulo}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold", st.pill)}>
+                      {STATUS_LABELS[visualStatus]}
+                    </span>
+                    {(t.etiquetas || []).map((e) => (
+                      <span
+                        key={e.id}
+                        className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-xs font-semibold"
+                        style={{ backgroundColor: `${e.cor}1f`, color: e.cor }}
+                      >
+                        {e.nome}
+                      </span>
+                    ))}
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Desktop table */}
-          <div className="hidden md:block bg-card rounded-xl border overflow-hidden">
+          <div className="hidden overflow-hidden rounded-xl border border-border bg-card md:block">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[1280px] text-sm">
                 <thead>
-                  <tr className="border-b">
+                  <tr className="border-b border-border">
                     <th className="w-10 px-3 py-3">
-                      <div className="w-5 h-5 rounded-full border-2 border-border" />
+                      <div className="h-4 w-4 rounded-full border border-[hsl(var(--task-brand))]" />
                     </th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground w-10">#</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Título</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Tipo</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">P. Contrária</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Cliente</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Comarca</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Vencimento</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Fatal</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Equipe</th>
-                    <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground">Responsável</th>
-                    <th className="w-10"></th>
+                    <th className="w-10 px-3 py-3 text-left text-base font-medium text-muted-foreground">#</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Título</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Tipo</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Processo</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">P. Contrária</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Cliente</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Comarca</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Vencimento</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Fatal</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Equipe</th>
+                    <th className="px-3 py-3 text-left text-base font-medium text-muted-foreground">Responsável</th>
+                    <th className="w-10" />
                   </tr>
                 </thead>
                 <tbody>
                   {paginated.map((t, idx) => {
-                    const st = STATUS_TAREFA[t.status as StatusTarefa] || STATUS_TAREFA.a_fazer;
+                    const visualStatus = getVisualStatus(t);
+                    const st = STATUS_VISUAL[visualStatus];
                     const rowNum = pag * porPag + idx + 1;
+                    const fatalAtrasado = !!t.prazo_fatal && new Date(`${t.prazo_fatal}T23:59:59`) < new Date();
+
                     return (
-                      <tr key={t.id} className="border-b last:border-0 hover:bg-muted/30 transition cursor-pointer group" onClick={() => setModalEditar(t)}>
-                        {/* Checkbox circle */}
-                        <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
+                      <tr
+                        key={t.id}
+                        className="group cursor-pointer border-b border-border transition hover:bg-muted/30 last:border-0"
+                        onClick={() => setModalEditar(t)}
+                      >
+                        <td className={cn("border-l-[3px] px-3 py-3", st.rowBorder)} onClick={(e) => e.stopPropagation()}>
                           <button
-                            onClick={() => {
-                              if (t.status !== "concluida") alterarStatus.mutate({ id: t.id, status: "concluida" });
-                              else alterarStatus.mutate({ id: t.id, status: "a_fazer" });
-                            }}
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
+                            onClick={() =>
+                              alterarStatus.mutate({
+                                id: t.id,
+                                status: t.status === "concluida" ? "a_fazer" : "concluida",
+                              })
+                            }
+                            className={cn(
+                              "flex h-5 w-5 items-center justify-center rounded-full border transition",
                               t.status === "concluida"
-                                ? "border-green-500 bg-green-500 text-white"
-                                : "border-border hover:border-muted-foreground"
-                            }`}>
-                            {t.status === "concluida" && <Check className="w-3 h-3" />}
+                                ? "border-[hsl(var(--task-accent-success))] bg-[hsl(var(--task-accent-success))] text-[hsl(var(--task-brand-foreground))]"
+                                : "border-[hsl(var(--task-brand))] hover:opacity-70",
+                            )}
+                          >
+                            {t.status === "concluida" && <Check className="h-3 w-3" />}
                           </button>
                         </td>
-                        {/* # */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{rowNum}</td>
-                        {/* Título + badges */}
-                        <td className="px-3 py-3 min-w-[200px]">
-                          <p className="font-medium text-foreground text-sm">{t.titulo}</p>
-                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium border ${st.cor}`}>{st.label}</span>
-                            {(t.etiquetas || []).map(e => (
-                              <span key={e.id} className="text-[10px] px-2 py-0.5 rounded text-white font-medium" style={{ backgroundColor: e.cor }}>{e.nome}</span>
+
+                        <td className="px-3 py-3 text-base text-muted-foreground">{rowNum}</td>
+
+                        <td className="min-w-[210px] px-3 py-3">
+                          <p className="text-[1.5rem] font-semibold leading-tight text-foreground">{t.titulo}</p>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold", st.pill)}>
+                              {STATUS_LABELS[visualStatus]}
+                            </span>
+                            {(t.etiquetas || []).map((e) => (
+                              <span
+                                key={e.id}
+                                className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-xs font-semibold"
+                                style={{ backgroundColor: `${e.cor}1f`, color: e.cor }}
+                              >
+                                {e.nome}
+                              </span>
                             ))}
                           </div>
                         </td>
-                        {/* Tipo */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground whitespace-nowrap">
+
+                        <td className="whitespace-nowrap px-3 py-3 text-base text-muted-foreground">
                           {TIPO_TAREFA[t.tipo as keyof typeof TIPO_TAREFA] || t.tipo}
                         </td>
-                        {/* P. Contrária */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.parte_contraria || "—"}</td>
-                        {/* Cliente */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.cliente_nome || "—"}</td>
-                        {/* Comarca */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.comarca || "—"}</td>
-                        {/* Vencimento */}
-                        <td className={`px-3 py-3 text-xs whitespace-nowrap ${isVencida(t) ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+                        <td className="max-w-[180px] truncate px-3 py-3 text-base text-muted-foreground">{t.intimacao_id || "—"}</td>
+                        <td className="max-w-[220px] px-3 py-3 text-base text-muted-foreground">{t.parte_contraria || "—"}</td>
+                        <td className="px-3 py-3 text-base text-muted-foreground">{t.cliente_nome || "—"}</td>
+                        <td className="px-3 py-3 text-base text-muted-foreground">{t.comarca || "—"}</td>
+
+                        <td className={cn("whitespace-nowrap px-3 py-3 text-base", isVencida(t) ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground")}>
                           {t.data_vencimento ? (
                             <>
                               {formatDate(t.data_vencimento)}
-                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && (
-                                <span className="block text-[10px]">{t.hora_vencimento}</span>
-                              )}
+                              {t.hora_vencimento && t.hora_vencimento !== "23:59" && <span className="block text-sm">{t.hora_vencimento}</span>}
                             </>
-                          ) : "—"}
+                          ) : (
+                            "—"
+                          )}
                         </td>
-                        {/* Fatal */}
-                        <td className={`px-3 py-3 text-xs whitespace-nowrap ${t.prazo_fatal && new Date(t.prazo_fatal) < new Date() ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+
+                        <td
+                          className={cn(
+                            "whitespace-nowrap px-3 py-3 text-base",
+                            fatalAtrasado ? "font-semibold text-[hsl(var(--task-accent-danger))]" : "text-foreground",
+                          )}
+                        >
                           {formatDate(t.prazo_fatal)}
                         </td>
-                        {/* Equipe */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.equipe_nome || "—"}</td>
-                        {/* Responsável */}
-                        <td className="px-3 py-3 text-xs text-muted-foreground">{t.responsavel_nome || "—"}</td>
-                        {/* Menu */}
-                        <td className="px-3 py-3" onClick={e => e.stopPropagation()}>
+
+                        <td className="px-3 py-3 text-base text-muted-foreground">{t.equipe_nome || "—"}</td>
+                        <td className="px-3 py-3 text-base text-muted-foreground">{t.responsavel_nome || "—"}</td>
+
+                        <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                           <div className="relative group/menu">
-                            <button className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition">
-                              <MoreHorizontal className="w-4 h-4" />
+                            <button className="rounded-lg p-1 text-muted-foreground transition hover:bg-muted">
+                              <MoreHorizontal className="h-4 w-4" />
                             </button>
-                            <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg py-1 z-10 invisible group-hover/menu:visible min-w-[140px]">
-                              <button onClick={() => setModalEditar(t)} className="w-full text-left px-3 py-2 text-xs hover:bg-muted transition flex items-center gap-2 text-foreground">
-                                <Pencil className="w-3 h-3" /> Editar
+                            <div className="invisible absolute right-0 top-full z-10 mt-1 min-w-[150px] rounded-lg border border-border bg-card py-1 shadow-lg group-hover/menu:visible">
+                              <button onClick={() => setModalEditar(t)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition hover:bg-muted">
+                                <Pencil className="h-3.5 w-3.5" /> Editar
                               </button>
-                              {t.status !== "concluida" && (
-                                <button onClick={() => alterarStatus.mutate({ id: t.id, status: "concluida" })} className="w-full text-left px-3 py-2 text-xs hover:bg-muted transition flex items-center gap-2 text-foreground">
-                                  <Check className="w-3 h-3" /> Concluir
+                              {t.status !== "concluida" ? (
+                                <button
+                                  onClick={() => alterarStatus.mutate({ id: t.id, status: "concluida" })}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition hover:bg-muted"
+                                >
+                                  <Check className="h-3.5 w-3.5" /> Concluir
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => alterarStatus.mutate({ id: t.id, status: "a_fazer" })}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition hover:bg-muted"
+                                >
+                                  <RotateCcw className="h-3.5 w-3.5" /> Reabrir
                                 </button>
                               )}
-                              {t.status === "concluida" && (
-                                <button onClick={() => alterarStatus.mutate({ id: t.id, status: "a_fazer" })} className="w-full text-left px-3 py-2 text-xs hover:bg-muted transition flex items-center gap-2 text-foreground">
-                                  <RotateCcw className="w-3 h-3" /> Reabrir
-                                </button>
-                              )}
-                              <button onClick={() => { excluir.mutate(t.id); }} className="w-full text-left px-3 py-2 text-xs hover:bg-muted transition flex items-center gap-2 text-destructive">
-                                <Trash2 className="w-3 h-3" /> Excluir
+                              <button
+                                onClick={() => excluir.mutate(t.id)}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-destructive transition hover:bg-muted"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" /> Excluir
                               </button>
                             </div>
                           </div>
@@ -326,65 +504,99 @@ export default function TarefasPage() {
             </div>
           </div>
 
-          {/* Pagination footer */}
-          <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
-            <span className="text-xs">
+          <div className="mt-3 flex items-center justify-between text-base text-muted-foreground">
+            <span>
               {startItem}-{endItem} de {filtered.length}
             </span>
-            <div className="flex items-center gap-3">
-              <select value={porPag} onChange={e => { setPorPag(Number(e.target.value)); setPag(0); }}
-                className="px-2 py-1.5 border border-border rounded-lg text-xs bg-background text-foreground">
+            <div className="flex items-center gap-2">
+              <select
+                value={porPag}
+                onChange={(e) => {
+                  setPorPag(Number(e.target.value));
+                  setPag(0);
+                }}
+                className="h-10 min-w-[80px] rounded-xl border border-border bg-background px-3 text-base text-foreground outline-none"
+              >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
               </select>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setPag(Math.max(0, pag - 1))} disabled={pag === 0}
-                  className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 transition">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-xs px-2">{pag + 1} / {totalPages || 1}</span>
-                <button onClick={() => setPag(Math.min(totalPages - 1, pag + 1))} disabled={pag >= totalPages - 1}
-                  className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 transition">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => setPag(Math.max(0, pag - 1))}
+                disabled={pag === 0}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="text-base text-muted-foreground">
+                {pag + 1} / {totalPages || 1}
+              </span>
+              <button
+                onClick={() => setPag(Math.min(totalPages - 1, pag + 1))}
+                disabled={pag >= totalPages - 1}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </>
       )}
 
-      {/* FAB mobile */}
-      <button onClick={() => setModalCriar(true)}
-        className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-foreground text-background rounded-full shadow-lg flex items-center justify-center active:scale-95 z-20">
-        <Plus className="w-6 h-6" />
+      <button
+        onClick={() => setModalCriar(true)}
+        className="fixed bottom-20 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(var(--task-brand))] text-[hsl(var(--task-brand-foreground))] shadow-lg md:hidden"
+      >
+        <Plus className="h-6 w-6" />
       </button>
 
-      {/* Modals */}
       {modalCriar && (
         <ModalTarefa
-          etiquetas={etiquetas} clientes={clientes} equipes={equipes} colaboradores={colaboradores}
-          onSalvar={(t) => { salvar.mutate(t as any, { onSuccess: () => setModalCriar(false) }); }}
-          onClose={() => setModalCriar(false)} isPending={salvar.isPending}
+          etiquetas={etiquetas}
+          clientes={clientes}
+          equipes={equipes}
+          colaboradores={colaboradores}
+          onSalvar={(t) => {
+            salvar.mutate(t as any, { onSuccess: () => setModalCriar(false) });
+          }}
+          onClose={() => setModalCriar(false)}
+          isPending={salvar.isPending}
         />
       )}
       {modalEditar && (
         <ModalTarefa
-          tarefa={modalEditar} etiquetas={etiquetas} clientes={clientes} equipes={equipes} colaboradores={colaboradores}
-          onSalvar={(t) => { salvar.mutate(t as any, { onSuccess: () => setModalEditar(null) }); }}
-          onClose={() => setModalEditar(null)} isPending={salvar.isPending}
-          onExcluir={() => { excluir.mutate(modalEditar.id); setModalEditar(null); }}
-          onAlterarStatus={(s) => { alterarStatus.mutate({ id: modalEditar.id, status: s }); setModalEditar(null); }}
+          tarefa={modalEditar}
+          etiquetas={etiquetas}
+          clientes={clientes}
+          equipes={equipes}
+          colaboradores={colaboradores}
+          onSalvar={(t) => {
+            salvar.mutate(t as any, { onSuccess: () => setModalEditar(null) });
+          }}
+          onClose={() => setModalEditar(null)}
+          isPending={salvar.isPending}
+          onExcluir={() => {
+            excluir.mutate(modalEditar.id);
+            setModalEditar(null);
+          }}
+          onAlterarStatus={(s) => {
+            alterarStatus.mutate({ id: modalEditar.id, status: s });
+            setModalEditar(null);
+          }}
         />
       )}
       {modalEtiquetas && (
-        <ModalEtiquetas etiquetas={etiquetas} onSalvar={(e) => salvarEtiqueta.mutate(e)}
-          onExcluir={(id) => excluirEtiqueta.mutate(id)} onClose={() => setModalEtiquetas(false)}
+        <ModalEtiquetas
+          etiquetas={etiquetas}
+          onSalvar={(e) => salvarEtiqueta.mutate(e)}
+          onExcluir={(id) => excluirEtiqueta.mutate(id)}
+          onClose={() => setModalEtiquetas(false)}
         />
       )}
     </div>
   );
 }
+
 
 // ─── Modal Tarefa ─────────────────────────────────────────────────────────────
 function ModalTarefa({

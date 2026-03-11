@@ -36,6 +36,24 @@
   --sidebar-accent-foreground: 240 5.9% 10%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 217.2 91.2% 59.8%;
+
+  --task-brand: 347 74% 35%;
+  --task-brand-foreground: 0 0% 100%;
+  --task-accent-warning: 36 95% 51%;
+  --task-accent-info: 218 84% 57%;
+  --task-accent-danger: 0 82% 58%;
+  --task-accent-success: 142 68% 44%;
+  --task-accent-purple: 262 82% 64%;
+  --task-soft-warning: 38 100% 96%;
+  --task-soft-warning-border: 38 91% 87%;
+  --task-soft-info: 220 100% 96%;
+  --task-soft-info-border: 220 86% 88%;
+  --task-soft-danger: 0 100% 97%;
+  --task-soft-danger-border: 0 93% 90%;
+  --task-soft-success: 142 62% 95%;
+  --task-soft-success-border: 142 43% 85%;
+  --task-soft-purple: 264 100% 97%;
+  --task-soft-purple-border: 263 88% 90%;
 }
 
 .dark {
@@ -58,6 +76,24 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
+
+  --task-brand: 347 74% 52%;
+  --task-brand-foreground: 0 0% 100%;
+  --task-accent-warning: 36 95% 58%;
+  --task-accent-info: 218 84% 65%;
+  --task-accent-danger: 0 82% 66%;
+  --task-accent-success: 142 68% 52%;
+  --task-accent-purple: 262 82% 72%;
+  --task-soft-warning: 35 42% 20%;
+  --task-soft-warning-border: 35 42% 30%;
+  --task-soft-info: 219 36% 20%;
+  --task-soft-info-border: 219 36% 30%;
+  --task-soft-danger: 0 42% 20%;
+  --task-soft-danger-border: 0 42% 30%;
+  --task-soft-success: 143 36% 20%;
+  --task-soft-success-border: 143 36% 30%;
+  --task-soft-purple: 263 36% 20%;
+  --task-soft-purple-border: 263 36% 30%;
 }
 
 html {
