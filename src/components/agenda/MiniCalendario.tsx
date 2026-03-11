@@ -1,4 +1,16 @@
-import { getMonthDays, isToday, isSameDay } from "@/lib/agenda-utils";
+import { useMemo } from "react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  getDay,
+  isToday as fnsIsToday,
+  isSameDay as fnsIsSameDay,
+  addMonths,
+  subMonths,
+} from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
@@ -6,104 +18,109 @@ interface Props {
   onSelectDate: (d: Date) => void;
 }
 
-const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default function MiniCalendario({ currentDate, onSelectDate }: Props) {
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const cells = getMonthDays(year, month);
-  const monthLabel = currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const dias = useMemo(() => {
+    const inicio = startOfMonth(currentDate);
+    const fim = endOfMonth(currentDate);
+    const diasMes = eachDayOfInterval({ start: inicio, end: fim });
+    const primeiroDia = getDay(inicio);
+    const padding: (Date | null)[] = Array(primeiroDia).fill(null);
 
-  function prevMonth() {
-    onSelectDate(new Date(year, month - 1, 1));
-  }
-  function nextMonth() {
-    onSelectDate(new Date(year, month + 1, 1));
-  }
+    // Trailing days from next month
+    const totalCells = padding.length + diasMes.length;
+    const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    const trailing: (Date | null)[] = Array(remaining).fill(null);
 
-  // Find which week row the current date is in to highlight the row
-  const dayOfMonth = currentDate.getDate();
-  const firstDayIndex = cells.findIndex(c => c && c.getDate() === 1);
-  const selectedIndex = cells.findIndex(c => c && isSameDay(c, currentDate));
+    return [...padding, ...diasMes, ...trailing];
+  }, [currentDate]);
+
+  const mesLabel = format(currentDate, "MMMM yyyy", { locale: ptBR });
+
+  // Find selected week row
+  const selectedIndex = dias.findIndex(
+    (d) => d && fnsIsSameDay(d, currentDate)
+  );
   const selectedRow = selectedIndex >= 0 ? Math.floor(selectedIndex / 7) : -1;
 
-  // Group cells into rows
+  // Build rows
   const rows: (Date | null)[][] = [];
-  for (let i = 0; i < cells.length; i += 7) {
-    rows.push(cells.slice(i, i + 7));
+  for (let i = 0; i < dias.length; i += 7) {
+    rows.push(dias.slice(i, i + 7));
   }
 
   return (
     <div className="select-none">
-      {/* Month navigation */}
-      <div className="flex items-center justify-between mb-5">
+      {/* Month nav */}
+      <div className="flex items-center justify-between mb-3">
         <button
-          onClick={prevMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition active:scale-90"
+          onClick={() => onSelectDate(subMonths(currentDate, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="text-sm font-semibold text-foreground capitalize tracking-tight">
-          {monthLabel}
+        <span className="text-sm font-semibold text-foreground capitalize min-w-[120px] text-center">
+          {mesLabel}
         </span>
         <button
-          onClick={nextMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition active:scale-90"
+          onClick={() => onSelectDate(addMonths(currentDate, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 mb-2">
-        {WEEKDAYS.map((w, i) => (
-          <div key={i} className="flex items-center justify-center">
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{w}</span>
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {DIAS_SEMANA.map((dia) => (
+          <div
+            key={dia}
+            className="text-center text-[11px] text-muted-foreground py-1 font-medium"
+          >
+            {dia}
           </div>
         ))}
       </div>
 
-      {/* Days grid - row by row */}
+      {/* Days grid */}
       <div className="space-y-0.5">
         {rows.map((row, rowIdx) => {
           const isSelectedRow = rowIdx === selectedRow;
           return (
             <div
               key={rowIdx}
-              className={`grid grid-cols-7 rounded-lg transition-colors ${
+              className={`grid grid-cols-7 gap-1 rounded-md transition-colors ${
                 isSelectedRow ? "bg-primary/10" : ""
               }`}
             >
-              {row.map((cell, colIdx) => {
-                if (!cell) {
+              {row.map((dia, colIdx) => {
+                if (!dia) {
                   return (
-                    <div key={colIdx} className="flex items-center justify-center h-9">
-                      <span className="text-[13px] text-muted-foreground/30 font-medium" />
-                    </div>
+                    <div
+                      key={`empty-${rowIdx}-${colIdx}`}
+                      className="aspect-square"
+                    />
                   );
                 }
 
-                const today = isToday(cell);
-                const selected = isSameDay(cell, currentDate);
-                const isCurrentMonth = cell.getMonth() === month;
+                const today = fnsIsToday(dia);
+                const selected = fnsIsSameDay(dia, currentDate);
 
                 return (
-                  <div key={colIdx} className="flex items-center justify-center h-9">
-                    <button
-                      onClick={() => onSelectDate(cell)}
-                      className={`w-8 h-8 rounded-lg text-[13px] font-medium transition-all duration-150 ${
-                        today
-                          ? "bg-primary text-primary-foreground shadow-sm font-bold"
-                          : selected
-                          ? "bg-primary/20 text-primary font-semibold"
-                          : isCurrentMonth
-                          ? "text-foreground hover:bg-muted active:bg-muted/80"
-                          : "text-muted-foreground/40"
-                      }`}
-                    >
-                      {cell.getDate()}
-                    </button>
-                  </div>
+                  <button
+                    key={format(dia, "yyyy-MM-dd")}
+                    onClick={() => onSelectDate(dia)}
+                    className={`aspect-square flex items-center justify-center rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                      today
+                        ? "bg-primary text-primary-foreground font-bold"
+                        : selected
+                        ? "bg-primary/20 text-foreground font-semibold"
+                        : "text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {format(dia, "d")}
+                  </button>
                 );
               })}
             </div>
