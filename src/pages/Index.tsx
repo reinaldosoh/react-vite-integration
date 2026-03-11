@@ -601,6 +601,7 @@ export default function HomePage() {
 
   async function handleBuscar(oab: string, uf: string, inicio: string, fim: string) {
     setShowBusca(false); setLoading(true); setErro(null); setLogBusca("Iniciando...\n");
+    ultimaBuscaRef.current = { oab: oab.trim(), data_inicio: inicio, data_fim: fim };
     try {
       const data = await iniciarBusca({ oab, uf_oab: uf, data_inicio: inicio, data_fim: fim });
       if (data.erro) { setErro(data.erro); setLoading(false); return; }

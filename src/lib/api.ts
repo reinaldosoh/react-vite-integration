@@ -115,12 +115,25 @@ export async function deletarIntimacao(id: string): Promise<{ ok: boolean; erro?
 }
 
 // ── Sync TODAS: busca /api/todas do EasyPanel, insere no Supabase só as que faltam
-export async function sincronizarTodasRemoto(): Promise<SyncResult> {
+export async function sincronizarTodasRemoto(filters?: {
+  oab?: string;
+  data_inicio?: string;
+  data_fim?: string;
+}): Promise<SyncResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Não autenticado')
 
-  const remoto: Intimacao[] = await callProxy('todas')
-  if (!remoto || remoto.length === 0) {
+  const remotoBruto: Intimacao[] = await callProxy('todas')
+  const oabFiltro = normalizeOab(filters?.oab)
+
+  const remoto = (remotoBruto || []).filter((i) => {
+    const oabItem = normalizeOab(i._oab || i.oab)
+    const matchOab = oabFiltro ? oabItem === oabFiltro : true
+    const matchData = isWithinDateRange(i.data_disponibilizacao, filters?.data_inicio, filters?.data_fim)
+    return matchOab && matchData
+  })
+
+  if (remoto.length === 0) {
     return { novas: 0, duplicadas: 0, duplicadasList: [] }
   }
 
