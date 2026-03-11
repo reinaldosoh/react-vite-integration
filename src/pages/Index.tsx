@@ -547,6 +547,7 @@ export default function HomePage() {
   const [erro, setErro] = useState<string | null>(null);
   const [zeroResultados, setZeroResultados] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showMais, setShowMais] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function handleLogout() { await supabase.auth.signOut(); navigate("/login"); }
@@ -715,7 +716,7 @@ export default function HomePage() {
 
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30" style={{ paddingBottom: 'var(--safe-bottom)' }}>
         <div className="flex items-center justify-around h-14">
-          <button onClick={() => { setView("home"); setShowBusca(false); }}
+          <button onClick={() => { setView("home"); setShowBusca(false); setShowMais(false); }}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 relative ${view === "home" || view === "detalhe" ? "text-gray-900" : "text-gray-400"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -727,50 +728,59 @@ export default function HomePage() {
               </span>
             )}
           </button>
-          <button onClick={() => setView("agenda")}
+          <button onClick={() => { setView("agenda"); setShowMais(false); }}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "agenda" ? "text-gray-900" : "text-gray-400"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <span className="text-[10px] font-medium">Agenda</span>
           </button>
-          <button onClick={() => setView("clientes")}
-            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "clientes" ? "text-gray-900" : "text-gray-400"}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="text-[10px] font-medium">Clientes</span>
-          </button>
-          <button onClick={() => setView("cron")}
+          <button onClick={() => { setView("cron"); setShowMais(false); }}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "cron" ? "text-gray-900" : "text-gray-400"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-[10px] font-medium">Alertas</span>
           </button>
-          <button onClick={() => setView("escritorio")}
-            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "escritorio" ? "text-gray-900" : "text-gray-400"}`}>
+          <button onClick={() => setShowMais(true)}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${["clientes", "escritorio", "tarefas"].includes(view) ? "text-gray-900" : "text-gray-400"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
             </svg>
-            <span className="text-[10px] font-medium">Equipe</span>
-          </button>
-          <button onClick={() => setView("tarefas")}
-            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition active:scale-95 ${view === "tarefas" ? "text-gray-900" : "text-gray-400"}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            <span className="text-[10px] font-medium">Tarefas</span>
-          </button>
-          <button onClick={handleLogout}
-            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-gray-400 transition active:scale-95">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span className="text-[10px] font-medium">Sair</span>
+            <span className="text-[10px] font-medium">Mais</span>
           </button>
         </div>
       </nav>
+
+      {/* Bottom Sheet "Mais" */}
+      {showMais && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/40 fade-in" onClick={() => setShowMais(false)}>
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl slide-up" style={{ paddingBottom: 'calc(var(--safe-bottom) + 16px)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+            </div>
+            <div className="px-4 pb-4 space-y-1">
+              {[
+                { key: "clientes" as MainView, label: "Clientes", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+                { key: "escritorio" as MainView, label: "Equipe", icon: "M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
+                { key: "tarefas" as MainView, label: "Tarefas", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
+              ].map(item => (
+                <button key={item.key} onClick={() => { setView(item.key); setShowMais(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition active:scale-[0.98] ${view === item.key ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-50"}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} /></svg>
+                  {item.label}
+                </button>
+              ))}
+              <div className="border-t my-2" />
+              <button onClick={() => { handleLogout(); setShowMais(false); }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition active:scale-[0.98]">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
