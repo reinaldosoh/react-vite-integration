@@ -393,8 +393,8 @@ export default function TarefasPage() {
 
                         <td className="px-3 py-3 text-xs text-muted-foreground">{rowNum}</td>
 
-                        <td className="min-w-[210px] px-3 py-3">
-                          <p className="text-[1.5rem] font-semibold leading-tight text-foreground">{t.titulo}</p>
+                        <td className="min-w-[200px] px-3 py-3">
+                          <p className="text-sm font-medium text-foreground">{t.titulo}</p>
                           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                             <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold", st.pill)}>
                               {STATUS_LABELS[visualStatus]}
