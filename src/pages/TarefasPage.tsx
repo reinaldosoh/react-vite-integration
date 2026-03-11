@@ -30,6 +30,7 @@ import {
   Tag,
   Trash2,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
