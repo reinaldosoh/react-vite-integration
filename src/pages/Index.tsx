@@ -566,25 +566,29 @@ export default function HomePage() {
       if (!status.rodando) {
         if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
         setLoading(false);
-        if (status.erro) { setErro(status.erro); }
-        else if (status.arquivo_resultado) {
-          try {
-            const sync = await sincronizarNovasIntimacoes(status.arquivo_resultado);
-            await carregarTodas();
-            if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
-            else if (sync.duplicadas > 0) showToastMsg(`Todas as ${sync.duplicadas} intimação(ões) já existem.`);
-            else setZeroResultados(true);
-          } catch { await carregarTodas(); setZeroResultados(true); }
-        } else {
-          // arquivo_resultado é null — EasyPanel pode ter considerado tudo duplicado internamente
-          // Tenta sincronizar via /api/todas como fallback
-          try {
-            const sync = await sincronizarTodasRemoto();
-            await carregarTodas();
-            if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
-            else if (sync.duplicadas > 0) showToastMsg(`Todas as ${sync.duplicadas} intimação(ões) já existem no sistema.`);
-            else setZeroResultados(true);
-          } catch { await carregarTodas(); setZeroResultados(true); }
+        if (status.erro) {
+          setErro(status.erro);
+          return;
+        }
+
+        try {
+          const sync = status.arquivo_resultado
+            ? await sincronizarNovasIntimacoes(status.arquivo_resultado)
+            : await sincronizarTodasRemoto();
+
+          await carregarTodas();
+
+          if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
+          else if (sync.duplicadas > 0) showToastMsg(`Todas as ${sync.duplicadas} intimação(ões) já existem no sistema.`);
+          else setZeroResultados(true);
+        } catch (e: unknown) {
+          await carregarTodas();
+          const msg = e instanceof Error ? e.message : "Erro ao sincronizar resultados";
+          if (msg.toLowerCase().includes("não autenticado") || msg.toLowerCase().includes("jwt")) {
+            setErro("Sessão expirada. Faça login novamente para salvar os resultados.");
+          } else {
+            setErro(msg);
+          }
         }
       }
     } catch { /* ignora erros de polling */ }
