@@ -572,7 +572,15 @@ export default function HomePage() {
           return;
         }
 
-        // Mesmo quando zero_resultados, tenta sincronizar via fallback (pode ter dados de busca anterior no servidor)
+        if (status.zero_resultados) {
+          setZeroResultados(true);
+          return;
+        }
+
+        if (!status.arquivo_resultado) {
+          setZeroResultados(true);
+          return;
+        }
 
         try {
           const filtrosBusca = {
@@ -581,27 +589,14 @@ export default function HomePage() {
             data_fim: ultimaBuscaRef.current?.data_fim,
           };
 
-          // Validação: não sincronizar se OAB não contém dígitos
           const oabDigits = (filtrosBusca.oab || '').replace(/\D/g, '');
           if (!oabDigits) {
             setErro('OAB inválida. Verifique o campo e tente novamente.');
             return;
           }
 
-          const sync = status.arquivo_resultado
-            ? await (async () => {
-                try {
-                  return await sincronizarNovasIntimacoes(status.arquivo_resultado, filtrosBusca);
-                } catch (e: unknown) {
-                  const msg = e instanceof Error ? e.message : "";
-                  if (msg.includes("RESULTADO_DIVERGENTE_DA_BUSCA")) {
-                    return await sincronizarTodasRemoto(filtrosBusca);
-                  }
-                  throw e;
-                }
-              })()
-            : await sincronizarTodasRemoto(filtrosBusca);
-
+          const sync = await sincronizarNovasIntimacoes(status.arquivo_resultado, filtrosBusca);
+          await limparResultadoRemoto(status.arquivo_resultado);
           await carregarTodas();
 
           if (sync.novas > 0) showToastMsg(`${sync.novas} nova(s) intimação(ões)! ${sync.duplicadas} já existia(m).`);
