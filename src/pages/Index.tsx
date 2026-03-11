@@ -657,7 +657,7 @@ export default function HomePage() {
             <span className="font-semibold text-gray-900 text-sm">JurisRapido</span>
           </div>
           <div className="flex items-center gap-1">
-            {view !== "cron" && (
+            {(view === "home" || view === "detalhe") && (
               <button onClick={() => setShowBusca(true)} className="p-2 rounded-xl bg-gray-900 text-white active:scale-95">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
