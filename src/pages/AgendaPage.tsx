@@ -75,17 +75,19 @@ export default function AgendaPage({ intimacoes = [] }: Props) {
   return (
     <div className="flex gap-4">
       {/* Sidebar desktop */}
-      <div className="hidden lg:block w-56 flex-shrink-0 space-y-4">
+      <div className="hidden lg:block w-60 flex-shrink-0 space-y-4">
         <button onClick={() => setModalCriar({ date: formatDateISO(currentDate) })}
-          className="w-full bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition flex items-center justify-center gap-2 active:scale-95">
+          className="w-full bg-gray-900 text-white py-3 rounded-full text-sm font-semibold hover:bg-gray-800 transition flex items-center justify-center gap-2 active:scale-95 shadow-sm">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           Novo
         </button>
-        <MiniCalendario currentDate={currentDate} onSelectDate={(d) => setCurrentDate(d)} />
-        <div className="bg-white rounded-xl border p-3 space-y-2">
-          <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+        <div className="bg-white rounded-2xl border p-4">
+          <MiniCalendario currentDate={currentDate} onSelectDate={(d) => setCurrentDate(d)} />
+        </div>
+        <div className="bg-white rounded-2xl border px-4 py-3">
+          <label className="flex items-center gap-2.5 text-xs text-gray-600 cursor-pointer select-none">
             <input type="checkbox" checked={showWeekend} onChange={(e) => setShowWeekend(e.target.checked)}
-              className="rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
+              className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 focus:ring-offset-0" />
             Mostrar fim de semana
           </label>
         </div>
