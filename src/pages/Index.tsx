@@ -10,6 +10,8 @@ import {
   type Intimacao,
 } from "@/lib/api";
 import CronPage from "@/pages/CronPage";
+import AgendaPage from "@/pages/AgendaPage";
+import ClientesPage from "@/pages/ClientesPage";
 import DatePicker from "@/components/DatePicker";
 
 // ─── Helpers de leitura/não-lida (localStorage) ───────────────────────────────
