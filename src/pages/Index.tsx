@@ -694,6 +694,10 @@ export default function HomePage() {
           <AgendaPage intimacoes={intimacoes} />
         ) : view === "clientes" ? (
           <ClientesPage />
+        ) : view === "escritorio" ? (
+          <EscritorioPage />
+        ) : view === "tarefas" ? (
+          <TarefasPage />
         ) : (
           <>
             {showBusca && <PainelBusca onClose={() => setShowBusca(false)} onBuscar={handleBuscar} loading={loading} />}
