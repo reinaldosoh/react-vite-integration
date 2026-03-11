@@ -126,9 +126,14 @@ export async function sincronizarTodasRemoto(filters?: {
   const remotoBruto: Intimacao[] = await callProxy('todas')
   const oabFiltro = normalizeOab(filters?.oab)
 
+  // Se não há OAB válida para filtrar, rejeitar para evitar importar dados de outros usuários
+  if (!oabFiltro) {
+    throw new Error('OAB inválida para sincronização')
+  }
+
   const remoto = (remotoBruto || []).filter((i) => {
     const oabItem = normalizeOab(i._oab || i.oab)
-    const matchOab = oabFiltro ? oabItem === oabFiltro : true
+    const matchOab = oabItem === oabFiltro
     const matchData = isWithinDateRange(i.data_disponibilizacao, filters?.data_inicio, filters?.data_fim)
     return matchOab && matchData
   })

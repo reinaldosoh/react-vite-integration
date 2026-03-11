@@ -572,12 +572,25 @@ export default function HomePage() {
           return;
         }
 
+        // Se a busca no CNJ retornou zero resultados, não tenta sincronizar do EasyPanel
+        if (status.zero_resultados) {
+          setZeroResultados(true);
+          return;
+        }
+
         try {
           const filtrosBusca = {
             oab: ultimaBuscaRef.current?.oab,
             data_inicio: ultimaBuscaRef.current?.data_inicio,
             data_fim: ultimaBuscaRef.current?.data_fim,
           };
+
+          // Validação: não sincronizar se OAB não contém dígitos
+          const oabDigits = (filtrosBusca.oab || '').replace(/\D/g, '');
+          if (!oabDigits) {
+            setErro('OAB inválida. Verifique o campo e tente novamente.');
+            return;
+          }
 
           const sync = status.arquivo_resultado
             ? await (async () => {
@@ -612,10 +625,16 @@ export default function HomePage() {
   }, []);
 
   async function handleBuscar(oab: string, uf: string, inicio: string, fim: string) {
+    // Validar que OAB contém apenas dígitos
+    const oabClean = oab.trim().replace(/\D/g, '');
+    if (!oabClean) {
+      showToastMsg('OAB inválida. Digite apenas números.');
+      return;
+    }
     setShowBusca(false); setLoading(true); setErro(null); setLogBusca("Iniciando...\n");
-    ultimaBuscaRef.current = { oab: oab.trim(), data_inicio: inicio, data_fim: fim };
+    ultimaBuscaRef.current = { oab: oabClean, data_inicio: inicio, data_fim: fim };
     try {
-      const data = await iniciarBusca({ oab, uf_oab: uf, data_inicio: inicio, data_fim: fim });
+      const data = await iniciarBusca({ oab: oabClean, uf_oab: uf, data_inicio: inicio, data_fim: fim });
       if (data.erro) { setErro(data.erro); setLoading(false); return; }
       pollingRef.current = setInterval(pollStatus, 1500);
     } catch (e: unknown) { setErro(e instanceof Error ? e.message : "Erro desconhecido"); setLoading(false); }
