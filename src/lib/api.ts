@@ -167,7 +167,7 @@ export async function sincronizarNovasIntimacoes(
 
   const chavesExistentes = new Set(
     (existentes || []).map((e) =>
-      `${e.numero_processo}|${e.tribunal}|${e.data_disponibilizacao}|${e.orgao}`
+      `${e.numero_processo}|${e.tribunal || ''}|${e.data_disponibilizacao || ''}|${e.orgao || ''}`
     )
   )
 
