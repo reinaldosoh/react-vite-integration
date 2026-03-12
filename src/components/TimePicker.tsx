@@ -85,7 +85,7 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
         </div>
         <div className="flex-1 p-3 overflow-y-auto no-scrollbar">
           <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Minuto</div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-6 gap-1">
             {MINUTES.map(m => (
               <button
                 key={m}
