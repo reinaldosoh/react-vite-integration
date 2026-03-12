@@ -91,7 +91,7 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
                 key={m}
                 type="button"
                 onClick={() => selectMinute(m)}
-                className={`py-2.5 rounded-xl text-sm font-medium transition active:scale-95 ${
+                className={`py-2 rounded-lg text-xs font-medium transition active:scale-95 ${
                   m === selM && selH === (parsed?.h ?? -1) ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
                 }`}
               >
