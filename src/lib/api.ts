@@ -198,7 +198,10 @@ export async function sincronizarNovasIntimacoes(
       oab: i._oab || i.oab || consulta.oab || null,
     }))
 
-    const { error } = await supabase.from('intimacoes').insert(rows)
+    const { error } = await supabase.from('intimacoes').upsert(rows, {
+      onConflict: 'user_id,numero_processo,tribunal,data_disponibilizacao',
+      ignoreDuplicates: true,
+    })
     if (error) throw new Error(error.message)
   }
 
