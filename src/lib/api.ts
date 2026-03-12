@@ -167,7 +167,7 @@ export async function sincronizarNovasIntimacoes(
 
   const chavesExistentes = new Set(
     (existentes || []).map((e) =>
-      `${e.numero_processo}|${e.tribunal}|${e.data_disponibilizacao}|${e.orgao}`
+      `${e.numero_processo}|${e.tribunal || ''}|${e.data_disponibilizacao || ''}|${e.orgao || ''}`
     )
   )
 
@@ -187,14 +187,14 @@ export async function sincronizarNovasIntimacoes(
     const rows = novas.map((i) => ({
       user_id: user.id,
       numero_processo: i.numero_processo || '',
-      orgao: i.orgao || null,
-      data_disponibilizacao: i.data_disponibilizacao || null,
+      orgao: i.orgao || '',
+      data_disponibilizacao: i.data_disponibilizacao || '',
       tipo_comunicacao: i.tipo_comunicacao || null,
       meio: i.meio || null,
       partes: i.partes || null,
       advogados: i.advogados || null,
       inteiro_teor: i.inteiro_teor || null,
-      tribunal: i.tribunal || null,
+      tribunal: i.tribunal || '',
       oab: i._oab || i.oab || consulta.oab || null,
     }))
 
