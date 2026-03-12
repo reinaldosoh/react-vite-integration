@@ -568,25 +568,22 @@ export default function HomePage() {
       const status = await fetchStatus();
       setLogBusca(status.log || "");
       if (!status.rodando) {
+        // Stop polling immediately to prevent re-entry
         if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
-        setLoading(false);
-        if (status.erro) {
-          setErro(status.erro);
-          return;
-        }
-
-        if (status.zero_resultados) {
-          setZeroResultados(true);
-          return;
-        }
-
-        if (!status.arquivo_resultado) {
-          setZeroResultados(true);
-          return;
-        }
-
         syncingRef.current = true;
+
         try {
+          setLoading(false);
+          if (status.erro) {
+            setErro(status.erro);
+            return;
+          }
+
+          if (status.zero_resultados || !status.arquivo_resultado) {
+            setZeroResultados(true);
+            return;
+          }
+
           const filtrosBusca = {
             oab: ultimaBuscaRef.current?.oab,
             data_inicio: ultimaBuscaRef.current?.data_inicio,
