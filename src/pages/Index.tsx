@@ -560,7 +560,10 @@ export default function HomePage() {
     try { const data = await fetchTodasIntimacoes(); setIntimacoesState(data); } catch (e) { console.error("Erro ao carregar intimações:", e); }
   }
 
+  const syncingRef = useRef(false);
+
   const pollStatus = useCallback(async () => {
+    if (syncingRef.current) return;
     try {
       const status = await fetchStatus();
       setLogBusca(status.log || "");
@@ -582,6 +585,7 @@ export default function HomePage() {
           return;
         }
 
+        syncingRef.current = true;
         try {
           const filtrosBusca = {
             oab: ultimaBuscaRef.current?.oab,
@@ -610,6 +614,8 @@ export default function HomePage() {
           } else {
             setErro(msg);
           }
+        } finally {
+          syncingRef.current = false;
         }
       }
     } catch { /* ignora erros de polling */ }
