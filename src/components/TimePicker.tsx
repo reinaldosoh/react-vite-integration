@@ -8,7 +8,7 @@ function parseHM(val: string): { h: number; m: number } | null {
 function fmt(n: number) { return String(n).padStart(2, '0') }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+const MINUTES = Array.from({ length: 60 }, (_, i) => i)
 
 interface Props {
   value: string
