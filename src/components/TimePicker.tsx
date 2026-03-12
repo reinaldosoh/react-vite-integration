@@ -8,7 +8,7 @@ function parseHM(val: string): { h: number; m: number } | null {
 function fmt(n: number) { return String(n).padStart(2, '0') }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+const MINUTES = Array.from({ length: 60 }, (_, i) => i)
 
 interface Props {
   value: string
@@ -85,13 +85,13 @@ export default function TimePicker({ value, onChange, label, className = '' }: P
         </div>
         <div className="flex-1 p-3 overflow-y-auto no-scrollbar">
           <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Minuto</div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-6 gap-1">
             {MINUTES.map(m => (
               <button
                 key={m}
                 type="button"
                 onClick={() => selectMinute(m)}
-                className={`py-2.5 rounded-xl text-sm font-medium transition active:scale-95 ${
+                className={`py-2 rounded-lg text-xs font-medium transition active:scale-95 ${
                   m === selM && selH === (parsed?.h ?? -1) ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
                 }`}
               >
